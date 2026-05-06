@@ -328,18 +328,18 @@ function buildTerrain() {
 function buildPerimeter() {
   const altMuro = 2.0;
   const grosor = 0.15;
-  // Los deslindes laterales llegan hasta la reja frontal.
-  const fondoR = L.lote.fondoDer;
-  const fondoI = L.lote.fondoIzq;
+  // Los deslindes laterales parten desde la línea de edificación; al frente va solo reja.
+  const fondoR = L.lote.fondoDer - cz;
+  const fondoI = L.lote.fondoIzq - cz;
 
   // Lateral derecho (dentro del lote)
   const muroR = box(grosor, altMuro, fondoR, 0xa8a098);
-  muroR.position.set(L.lote.frente - grosor / 2, altMuro / 2, fondoR / 2);
+  muroR.position.set(L.lote.frente - grosor / 2, altMuro / 2, cz + fondoR / 2);
   groups.perimeter.add(muroR);
 
   // Lateral izquierdo (dentro del lote)
   const muroL = box(grosor, altMuro, fondoI, 0xa8a098);
-  muroL.position.set(grosor / 2, altMuro / 2, fondoI / 2);
+  muroL.position.set(grosor / 2, altMuro / 2, cz + fondoI / 2);
   groups.perimeter.add(muroL);
 
   // Muro fondo
@@ -354,20 +354,7 @@ function buildPerimeter() {
   // Bandas horizontales en muro derecho
   for (let h of [0.45, 0.9, 1.35, 1.8]) {
     const banda = box(fondoR - 0.1, 0.02, grosor + 0.01, 0x807870);
-    banda.position.set(L.lote.frente - grosor / 2, h, fondoR / 2);
-    banda.rotation.y = Math.PI / 2;
-    groups.perimeter.add(banda);
-  }
-
-  // Pandereta de bloques visible en el antejardín izquierdo, más baja que el deslinde trasero.
-  const frenteMuro = 3.0;
-  const altAnte = 1.35;
-  const anteL = box(grosor, altAnte, frenteMuro, 0xb7b3aa);
-  anteL.position.set(grosor / 2, altAnte / 2, frenteMuro / 2);
-  groups.perimeter.add(anteL);
-  for (let h of [0.42, 0.84, 1.26]) {
-    const banda = box(frenteMuro - 0.12, 0.025, grosor + 0.02, 0x87837c);
-    banda.position.set(grosor / 2, h, frenteMuro / 2);
+    banda.position.set(L.lote.frente - grosor / 2, h, cz + fondoR / 2);
     banda.rotation.y = Math.PI / 2;
     groups.perimeter.add(banda);
   }
