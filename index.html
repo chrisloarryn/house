@@ -375,97 +375,79 @@ function buildFence() {
   groups.fence.add(marcoPort);
 }
 
-// ── Casa existente: L-SHAPE (vol IZQ full + vol DER recortado) ─────────────
+// ── Casa existente: volumen rectangular con vanos según elevaciones ─────────
 function buildExisting(paleta) {
   const p = PAL[paleta];
-  const wL = L.casa.volIzq.ancho, fL = L.casa.volIzq.fondo;     // 4.00 × 9.73
-  const wR = L.casa.volDer.ancho, fR = L.casa.volDer.fondo;     // 2.30 × 4.78
+  const w = L.casa.ancho, f = L.casa.fondo;
   const a1 = L.casa.alto1, a2 = L.casa.alto2;
 
-  // Volumen izquierdo (principal, fondo completo)
-  groups.existing.add(place(box(wL, a1, fL, p.estuco1), cx, 0, cz));
-  groups.existing.add(place(box(wL, a2, fL, p.siding2), cx, a1, cz));
-  // Volumen derecho (secundario, sólo mitad frontal — atrás queda PATIO INTERIOR)
-  groups.existing.add(place(box(wR, a1, fR, p.estuco1), cx + wL, 0, cz));
-  groups.existing.add(place(box(wR, a2, fR, p.siding2), cx + wL, a1, cz));
+  groups.existing.add(place(box(w, a1, f, p.estuco1), cx, 0, cz));
+  groups.existing.add(place(box(w, a2, f, p.siding2), cx, a1, cz));
 
-  // Banda divisoria entre piso 1 (estuco) y piso 2 (siding) — visible en foto
   const bandaCol = paleta === 'actual' ? 0xa89880
                  : paleta === 'idea'   ? 0x707070
                  : p.marco;
-  // Banda sobre vol IZQ
-  const bandaL = box(wL + 0.05, 0.08, fL + 0.05, bandaCol);
-  bandaL.position.set(cx + wL / 2, a1 + 0.04, cz + fL / 2);
-  groups.existing.add(bandaL);
-  // Banda sobre vol DER (sólo donde hay volumen)
-  const bandaR = box(wR + 0.05, 0.08, fR + 0.05, bandaCol);
-  bandaR.position.set(cx + wL + wR / 2, a1 + 0.04, cz + fR / 2);
-  groups.existing.add(bandaR);
+  const banda = box(w + 0.05, 0.08, f + 0.05, bandaCol);
+  banda.position.set(cx + w / 2, a1 + 0.04, cz + f / 2);
+  groups.existing.add(banda);
 
-  // Líneas horizontales del siding del piso 2 (paleta actual / idea)
   if (paleta === 'actual' || paleta === 'idea') {
     const lineaCol = paleta === 'actual' ? 0x988878 : 0x808080;
     const lineaMatS = mat(lineaCol, { rough: 0.95 });
     for (let i = 1; i < 12; i++) {
       const yL = a1 + 0.10 + i * 0.18;
       if (yL > a1 + a2 - 0.05) break;
-      // Frente (toda la fachada cx..cx+ancho)
-      const lF = new THREE.Mesh(new THREE.BoxGeometry(L.casa.ancho - 0.05, 0.012, 0.01), lineaMatS);
-      lF.position.set(cx + L.casa.ancho / 2, yL, cz - 0.022);
+      const lF = new THREE.Mesh(new THREE.BoxGeometry(w - 0.05, 0.012, 0.01), lineaMatS);
+      lF.position.set(cx + w / 2, yL, cz - 0.022);
       groups.existing.add(lF);
-      // Trasera vol IZQ
-      const lB = new THREE.Mesh(new THREE.BoxGeometry(wL - 0.05, 0.012, 0.01), lineaMatS);
-      lB.position.set(cx + wL / 2, yL, cz + fL + 0.022);
+      const lB = new THREE.Mesh(new THREE.BoxGeometry(w - 0.05, 0.012, 0.01), lineaMatS);
+      lB.position.set(cx + w / 2, yL, cz + f + 0.022);
       groups.existing.add(lB);
-      // Trasera vol DER (en z = cz + fR)
-      const lBR = new THREE.Mesh(new THREE.BoxGeometry(wR - 0.05, 0.012, 0.01), lineaMatS);
-      lBR.position.set(cx + wL + wR / 2, yL, cz + fR + 0.022);
-      groups.existing.add(lBR);
     }
   }
 
-  // Materiales
   const vidrioMat = mat(p.vidrio, { metal: 0.4, rough: 0.15, opacity: 0.85 });
   const marcoMat = mat(p.marco, { rough: 0.6 });
 
-  // Ventana con marco saliente (estuco) — el marco saliente blanco-cremoso de la foto
-  // Es CLARAMENTE más claro que el muro y SOBRESALE 8-10 cm formando un bisel.
-  const ventanaConMarco = (w, h, x, y, z, salienteMarco = 0.22) => {
-    // Color del saliente: BLANCO-CREMA, más claro que el estuco del muro
+  const ventanaConMarco = (ww, hh, x, y, z, salienteMarco = 0.22) => {
     const colorSaliente = paleta === 'actual' ? 0xf6ecd6
                         : paleta === 'idea'   ? 0xe8e8e8
                         : 0xfaf2dc;
     const salMat = mat(colorSaliente, { rough: 0.85 });
-    // Saliente: caja gruesa que se proyecta hacia adelante 0.10
     const sal = new THREE.Mesh(
-      new THREE.BoxGeometry(w + salienteMarco * 2, h + salienteMarco * 2, 0.12), salMat);
+      new THREE.BoxGeometry(ww + salienteMarco * 2, hh + salienteMarco * 2, 0.12), salMat);
     sal.position.set(x, y, z + 0.06);
-    sal.castShadow = true; sal.receiveShadow = true;
+    sal.castShadow = true;
+    sal.receiveShadow = true;
     groups.existing.add(sal);
-    // Marco interno de la ventana (color marco normal)
-    const marco = new THREE.Mesh(new THREE.BoxGeometry(w + 0.08, h + 0.08, 0.05), marcoMat);
+
+    const marco = new THREE.Mesh(new THREE.BoxGeometry(ww + 0.08, hh + 0.08, 0.05), marcoMat);
     marco.position.set(x, y, z + 0.13);
     groups.existing.add(marco);
-    // Vidrio
-    const vidrio = new THREE.Mesh(new THREE.BoxGeometry(w, h, 0.04), vidrioMat);
+
+    const vidrio = new THREE.Mesh(new THREE.BoxGeometry(ww, hh, 0.04), vidrioMat);
     vidrio.position.set(x, y, z + 0.16);
     groups.existing.add(vidrio);
   };
-  const ventanaSimple = (w, h, x, y, z) => {
-    const marco = new THREE.Mesh(new THREE.BoxGeometry(w + 0.10, h + 0.10, 0.04), marcoMat);
+
+  const ventanaSimple = (ww, hh, x, y, z) => {
+    const marco = new THREE.Mesh(new THREE.BoxGeometry(ww + 0.10, hh + 0.10, 0.04), marcoMat);
     marco.position.set(x, y, z);
-    const vidrio = new THREE.Mesh(new THREE.BoxGeometry(w, h, 0.05), vidrioMat);
+    const vidrio = new THREE.Mesh(new THREE.BoxGeometry(ww, hh, 0.05), vidrioMat);
     vidrio.position.set(x, y, z + 0.005);
     groups.existing.add(marco, vidrio);
   };
 
-  // Ventana grande del living (PISO 1, vol IZQ): proporciones más cuadradas como foto
-  // h=1.5 w=1.7 → algo cuadrada con marco saliente blanco prominente
-  ventanaConMarco(1.7, 1.5, cx + wL / 2, 1.45, cz - 0.04);
+  const ventanaLateral = (ww, hh, x, y, z, side = 1) => {
+    const marco = new THREE.Mesh(new THREE.BoxGeometry(0.04, hh + 0.10, ww + 0.10), marcoMat);
+    marco.position.set(x, y, z);
+    const vidrio = new THREE.Mesh(new THREE.BoxGeometry(0.05, hh, ww), vidrioMat);
+    vidrio.position.set(x + side * 0.005, y, z);
+    groups.existing.add(marco, vidrio);
+  };
 
-  // Puerta de acceso (en vol DER, piso 1) - color cream sólido sin marco prominente
-  const puertaW = 0.90, puertaH = 2.10;
-  const puertaX = cx + wL + wR / 2;
+  const puertaW = 0.92, puertaH = 2.10;
+  const puertaX = cx + 4.02;
   const puertaCol = paleta === 'actual' ? 0xb8a48a
                   : paleta === 'idea'   ? 0x383838
                   : p.puerta;
@@ -474,81 +456,71 @@ function buildExisting(paleta) {
   puerta.position.set(puertaX, puertaH / 2, cz - 0.035);
   puerta.castShadow = true;
   groups.existing.add(puerta);
-  // Líneas verticales de la puerta paneleada
+
   const puertaLineMat = mat(0x6a5a48, { rough: 0.7 });
-  for (const xL of [-puertaW/3, puertaW/3]) {
+  for (const xL of [-puertaW / 3, puertaW / 3]) {
     const ln = new THREE.Mesh(new THREE.BoxGeometry(0.015, puertaH - 0.15, 0.005), puertaLineMat);
     ln.position.set(puertaX + xL, puertaH / 2, cz - 0.07);
     groups.existing.add(ln);
   }
-  // Manija
+
   const manija = new THREE.Mesh(new THREE.SphereGeometry(0.035, 12, 12),
                                  mat(0x808080, { metal: 0.6, rough: 0.4 }));
   manija.position.set(puertaX + puertaW / 2 - 0.12, puertaH / 2, cz - 0.08);
   groups.existing.add(manija);
 
-  // Escalones de hormigón frente a la puerta
+  ventanaSimple(0.28, 1.95, puertaX + 0.62, 1.05, cz - 0.025);
+  ventanaConMarco(1.75, 1.38, cx + 5.15, 1.28, cz - 0.04, 0.18);
+
   const escalonM = mat(0xc8c0b0, { rough: 0.95 });
   for (let i = 0; i < 3; i++) {
-    const e = new THREE.Mesh(new THREE.BoxGeometry(1.4, 0.16, 0.32 - i * 0.06), escalonM);
-    e.position.set(puertaX, 0.08 + i * 0.16, cz - 0.32 - i * 0.32);
-    e.castShadow = true; e.receiveShadow = true;
-    groups.existing.add(e);
+    const esc = new THREE.Mesh(new THREE.BoxGeometry(1.4, 0.16, 0.32 - i * 0.06), escalonM);
+    esc.position.set(puertaX, 0.08 + i * 0.16, cz - 0.32 - i * 0.32);
+    esc.castShadow = true;
+    esc.receiveShadow = true;
+    groups.existing.add(esc);
   }
 
-  // Ventana piso 2 lado derecho (sobre la puerta)
-  ventanaSimple(1.4, 1.0, cx + wL + wR / 2, a1 + 1.5, cz - 0.025);
-
-  // Trasera del vol IZQ (gran ventanal corredizo al patio) - centrada en vol IZQ
-  ventanaSimple(2.5, 1.8, cx + wL / 2, 1.4, cz + fL + 0.025);
-  ventanaSimple(1.2, 1.0, cx + wL / 2, a1 + 1.5, cz + fL + 0.025);
-  // Trasera del vol DER (al patio interior) - dos ventanas verticales angostas (ver foto lateral)
-  const ventVerticalY = 1.6;
-  for (const xv of [cx + wL + 0.6, cx + wL + wR - 0.6]) {
-    ventanaSimple(0.45, 1.5, xv, ventVerticalY, cz + fR + 0.025);
+  ventanaSimple(1.55, 1.28, cx + 2.00, a1 + 1.42, cz - 0.025);
+  for (const xv of [cx + 4.90, cx + 5.20, cx + 5.50]) {
+    ventanaSimple(0.14, 0.34, xv, a1 + 1.78, cz - 0.025);
   }
 
-  // Bajantes de aguas lluvia (decorativo, visible en fotos reales)
+  ventanaSimple(1.90, 1.86, cx + 1.72, 1.34, cz + f + 0.025);
+  ventanaSimple(1.90, 1.86, cx + 4.58, 1.34, cz + f + 0.025);
+  ventanaSimple(0.55, 0.28, cx + w / 2, 1.92, cz + f + 0.025);
+  ventanaSimple(0.55, 0.92, cx + 2.55, a1 + 1.20, cz + f + 0.025);
+  ventanaSimple(0.55, 0.92, cx + 4.05, a1 + 1.20, cz + f + 0.025);
+
+  ventanaLateral(0.52, 1.72, cx + w + 0.025, 1.40, cz + 2.10, 1);
+  ventanaLateral(0.52, 1.72, cx + w + 0.025, 1.40, cz + 5.30, 1);
+  ventanaLateral(0.60, 1.55, cx - 0.025, a1 + 1.20, cz + 5.20, -1);
+
   const bajM = mat(0x222222, { metal: 0.4, rough: 0.5 });
-  for (const xb of [cx - 0.05, cx + L.casa.ancho + 0.05]) {
+  for (const xb of [cx - 0.05, cx + w + 0.05]) {
     const baj = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.045, a1 + a2, 8), bajM);
     baj.position.set(xb, (a1 + a2) / 2, cz - 0.06);
     groups.existing.add(baj);
   }
 
-  // ── Outlines de recintos interiores (solo visibles desde vista planta) ──────
-  // Se dibujan a ras del suelo para no interferir con el techo desde ángulos oblicuos
   const yLine = 0.02;
   const lineMat = new THREE.LineBasicMaterial({ color: 0x884422, transparent: true, opacity: 0.7 });
-  function rect(x, z, w, d) {
+  function rect(x, z, ww, d) {
     const pts = [
       new THREE.Vector3(x, yLine, z),
-      new THREE.Vector3(x + w, yLine, z),
-      new THREE.Vector3(x + w, yLine, z + d),
+      new THREE.Vector3(x + ww, yLine, z),
+      new THREE.Vector3(x + ww, yLine, z + d),
       new THREE.Vector3(x, yLine, z + d),
       new THREE.Vector3(x, yLine, z),
     ];
     return new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), lineMat);
   }
-  const wL_in = wL - 0.2, wR_in = wR - 0.2;
-  groups.existing.add(rect(cx + 0.1, cz + 0.1, wL_in, 3.0));
-  groups.existing.add(rect(cx + 0.1, cz + 3.2, wL_in, 2.7));
-  groups.existing.add(rect(cx + 0.1, cz + 6.0, wL_in, 1.5));
-  groups.existing.add(rect(cx + 0.1, cz + 7.6, wL_in, fL - 7.7));
-  groups.existing.add(rect(cx + wL + 0.1, cz + 0.1, wR_in, 3.0));
-  groups.existing.add(rect(cx + wL + 0.1, cz + 3.2, wR_in, 1.45));
-  // Patio interior marcado a ras del suelo
-  const patioMat = new THREE.LineDashedMaterial({ color: 0x4a8a4a, dashSize: 0.2, gapSize: 0.1 });
-  const patioPts = [
-    new THREE.Vector3(cx + wL, yLine, cz + fR),
-    new THREE.Vector3(cx + L.casa.ancho, yLine, cz + fR),
-    new THREE.Vector3(cx + L.casa.ancho, yLine, cz + fL),
-    new THREE.Vector3(cx + wL, yLine, cz + fL),
-    new THREE.Vector3(cx + wL, yLine, cz + fR),
-  ];
-  const patioLine = new THREE.Line(new THREE.BufferGeometry().setFromPoints(patioPts), patioMat);
-  patioLine.computeLineDistances();
-  groups.existing.add(patioLine);
+  groups.existing.add(rect(cx + 0.1, cz + 0.1, 2.55, 3.2));
+  groups.existing.add(rect(cx + 2.75, cz + 0.1, 3.45, 2.9));
+  groups.existing.add(rect(cx + 0.1, cz + 3.45, 3.0, 2.55));
+  groups.existing.add(rect(cx + 3.25, cz + 3.45, 2.95, 2.55));
+  groups.existing.add(rect(cx + 0.1, cz + 6.15, 3.0, 3.45));
+  groups.existing.add(rect(cx + 3.25, cz + 6.15, 2.95, 3.45));
 }
 
 // ── Techo: faldón principal longitudinal + gables secundarios ───────────────
