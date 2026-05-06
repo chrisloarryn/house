@@ -689,6 +689,48 @@ function buildNeighbors() {
   groups.neighbors.add(mkVecina(-7.82, true));
   // Vecino derecho: lote comienza en x = lote.frente, sin espejar
   groups.neighbors.add(mkVecina(L.lote.frente, false));
+
+  // ── Pandereta perimetral lateral de cada vecina (separa de SUS vecinos) ──
+  // El lote vecino izq va de x=-7.82 a x=0 → su pandereta IZQUIERDA está en x=-7.82
+  // El lote vecino der va de x=7.82 a x=15.64 → su pandereta DERECHA está en x=15.64
+  const muroMat = mat(0xa8a098, { rough: 0.95 });
+  const altMuro = 2.0, grosor = 0.15;
+  // Pandereta izq del vecino izq
+  const pandLI = box(grosor, altMuro, L.lote.fondoIzq, 0xa8a098);
+  pandLI.position.set(-7.82 - grosor / 2, altMuro / 2, L.lote.fondoIzq / 2);
+  groups.neighbors.add(pandLI);
+  // Pandereta der del vecino der (asumo mismo fondoDer = 14.05)
+  const pandRD = box(grosor, altMuro, L.lote.fondoDer, 0xa8a098);
+  pandRD.position.set(L.lote.frente + 7.82 + grosor / 2, altMuro / 2, L.lote.fondoDer / 2);
+  groups.neighbors.add(pandRD);
+
+  // ── Reja frontal de cada vecina (al frente de su lote) ───────────────────
+  function rejaFrontal(xStart, xEnd) {
+    const fierroM = mat(0x222222, { metal: 0.4, rough: 0.5 });
+    const altReja = 2.0;
+    const ancho = xEnd - xStart;
+    // Travesaños horizontales sup/inf
+    for (const y of [0.2, altReja - 0.1]) {
+      const t = box(ancho, 0.06, 0.04, 0x222222);
+      t.position.set(xStart + ancho / 2, y, 0.05);
+      groups.neighbors.add(t);
+    }
+    // Barrotes verticales
+    const n = Math.floor(ancho / 0.12);
+    for (let i = 0; i < n; i++) {
+      const x = xStart + (i + 0.5) * (ancho / n);
+      const b = new THREE.Mesh(new THREE.BoxGeometry(0.025, altReja + 0.15, 0.025), fierroM);
+      b.position.set(x, (altReja + 0.15) / 2, 0.05);
+      b.castShadow = true;
+      groups.neighbors.add(b);
+    }
+    // Portón centrado
+    const marcoP = box(1.0, altReja, 0.06, 0x2a2a2a);
+    marcoP.position.set(xStart + ancho / 2, altReja / 2, 0.04);
+    groups.neighbors.add(marcoP);
+  }
+  rejaFrontal(-7.82, 0);
+  rejaFrontal(L.lote.frente, L.lote.frente + 7.82);
 }
 
 // ── Cubo frontal (parametrizado por paleta) ────────────────────────────────
