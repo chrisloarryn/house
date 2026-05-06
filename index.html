@@ -153,9 +153,9 @@ const SCENARIOS = {
     descripcion: 'Cubo frontal 1 piso · siding gris',
     cubo:    { ancho: 7.82, fondo: 3.0, alto: 2.7, pisos: 1 },
     ampBack: { ancho: 7.82, fondo: 1.3, alto: 2.7 },
-    // Strips laterales: fondo = lote.fondo - antejardín = 14.05 - 3 = 11.05
-    ampLatL: { ancho: 0.76, fondo: 11.0, alto: 2.7 },
-    ampLatR: { ancho: 0.76, fondo: 11.0, alto: 2.7 },
+    // Strips laterales: fondo = casa.fondo (9.73) → al ras del muro trasero de la casa
+    ampLatL: { ancho: 0.76, fondo: 9.73, alto: 2.7 },
+    ampLatR: { ancho: 0.76, fondo: 9.73, alto: 2.7 },
     cierraPatioInt: true,
     paleta: 'idea', fence: false, pergola: false,
   },
@@ -323,29 +323,31 @@ function buildPerimeter() {
   // Lote irregular: muro fondo derecho a z=fondoDer, izquierdo a z=fondoIzq
   // Para simplificar: dibujo muros laterales que conectan los puntos del lote.
 
-  // Muro lateral derecho: de (frente, 0) a (frente, fondoDer)
+  // Muros perimetrales — TODOS DENTRO del lote (no sobresalen del polígono)
+  // Lateral derecho: dentro del lote, justo en x = frente - grosor/2
   const muroR = box(grosor, altMuro, L.lote.fondoDer, 0xa8a098);
-  muroR.position.set(L.lote.frente + grosor / 2, altMuro / 2, L.lote.fondoDer / 2);
+  muroR.position.set(L.lote.frente - grosor / 2, altMuro / 2, L.lote.fondoDer / 2);
   groups.perimeter.add(muroR);
 
-  // Muro lateral izquierdo: de (0, 0) a (0, fondoIzq)
+  // Lateral izquierdo: dentro del lote, justo en x = grosor/2
   const muroL = box(grosor, altMuro, L.lote.fondoIzq, 0xa8a098);
-  muroL.position.set(-grosor / 2, altMuro / 2, L.lote.fondoIzq / 2);
+  muroL.position.set(grosor / 2, altMuro / 2, L.lote.fondoIzq / 2);
   groups.perimeter.add(muroL);
 
-  // Muro inclinado del fondo (única arista del fondo del trapecio):
-  // de (0, fondoIzq) a (frente, fondoDer)
+  // Muro fondo: dentro del lote, justo antes de z = lote.fondo
   const dx = L.lote.frente, dz = L.lote.fondoDer - L.lote.fondoIzq;
   const lenInc = Math.sqrt(dx * dx + dz * dz);
   const muroInc = box(lenInc, altMuro, grosor, 0xa8a098);
-  muroInc.position.set(L.lote.frente / 2, altMuro / 2, (L.lote.fondoIzq + L.lote.fondoDer) / 2);
+  // Posicionar el muro JUSTO DENTRO del lote, no sobre la línea
+  muroInc.position.set(L.lote.frente / 2, altMuro / 2,
+                       (L.lote.fondoIzq + L.lote.fondoDer) / 2 - grosor / 2);
   muroInc.rotation.y = -Math.atan2(dz, dx);
   groups.perimeter.add(muroInc);
 
   // Textura de bloques de hormigón: bandas horizontales tenues sobre el muro derecho
   for (let h of [0.6, 1.2, 1.8]) {
     const banda = box(L.lote.fondoDer - 0.1, 0.02, grosor + 0.01, 0x807870);
-    banda.position.set(L.lote.frente + grosor / 2, h, L.lote.fondoDer / 2);
+    banda.position.set(L.lote.frente - grosor / 2, h, L.lote.fondoDer / 2);
     banda.rotation.y = Math.PI / 2;
     groups.perimeter.add(banda);
   }
@@ -717,13 +719,13 @@ function buildNeighbors() {
   // El lote vecino der va de x=7.82 a x=15.64 → su pandereta DERECHA está en x=15.64
   const muroMat = mat(0xa8a098, { rough: 0.95 });
   const altMuro = 2.0, grosor = 0.15;
-  // Pandereta izq del vecino izq
+  // Pandereta izq del vecino izq — DENTRO del lote vecino (justo en x = -7.82 + grosor/2)
   const pandLI = box(grosor, altMuro, L.lote.fondoIzq, 0xa8a098);
-  pandLI.position.set(-7.82 - grosor / 2, altMuro / 2, L.lote.fondoIzq / 2);
+  pandLI.position.set(-7.82 + grosor / 2, altMuro / 2, L.lote.fondoIzq / 2);
   groups.neighbors.add(pandLI);
-  // Pandereta der del vecino der (asumo mismo fondoDer = 14.05)
+  // Pandereta der del vecino der — DENTRO del lote vecino (justo en x = lote.frente + 7.82 - grosor/2)
   const pandRD = box(grosor, altMuro, L.lote.fondoDer, 0xa8a098);
-  pandRD.position.set(L.lote.frente + 7.82 + grosor / 2, altMuro / 2, L.lote.fondoDer / 2);
+  pandRD.position.set(L.lote.frente + 7.82 - grosor / 2, altMuro / 2, L.lote.fondoDer / 2);
   groups.neighbors.add(pandRD);
 
   // ── Reja frontal de cada vecina (al frente de su lote) ───────────────────
