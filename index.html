@@ -327,13 +327,8 @@ function buildPerimeter() {
   muroL.position.set(-grosor / 2, altMuro / 2, L.lote.fondoIzq / 2);
   groups.perimeter.add(muroL);
 
-  // Muro fondo derecho (entre fondoDer y fondoIzq, lado derecho del lote)
-  const muroBack = box(L.lote.frente, altMuro, grosor, 0xa8a098);
-  muroBack.position.set(L.lote.frente / 2, altMuro / 2, L.lote.fondoDer + grosor / 2);
-  groups.perimeter.add(muroBack);
-
-  // Muro inclinado del fondo (cierra el trapecio): de (0, fondoIzq) a (frente, fondoDer)
-  // Lo simplifico como un panel rectangular inclinado
+  // Muro inclinado del fondo (única arista del fondo del trapecio):
+  // de (0, fondoIzq) a (frente, fondoDer)
   const dx = L.lote.frente, dz = L.lote.fondoDer - L.lote.fondoIzq;
   const lenInc = Math.sqrt(dx * dx + dz * dz);
   const muroInc = box(lenInc, altMuro, grosor, 0xa8a098);
@@ -341,8 +336,7 @@ function buildPerimeter() {
   muroInc.rotation.y = -Math.atan2(dz, dx);
   groups.perimeter.add(muroInc);
 
-  // Textura de bloques de hormigón: líneas horizontales en los muros
-  // Las simulo con bandas oscuras tenues
+  // Textura de bloques de hormigón: bandas horizontales tenues sobre el muro derecho
   for (let h of [0.6, 1.2, 1.8]) {
     const banda = box(L.lote.fondoDer - 0.1, 0.02, grosor + 0.01, 0x807870);
     banda.position.set(L.lote.frente + grosor / 2, h, L.lote.fondoDer / 2);
