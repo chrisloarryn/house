@@ -36,7 +36,7 @@
     <div class="tab active" data-scenario="actual">Actual<span class="sub">sin ampliación</span></div>
     <div class="tab" data-scenario="idea">Idea (ref.)<span class="sub">cubo gris · 1 piso</span></div>
     <div class="tab" data-scenario="medA">Med. · DFL 2<span class="sub">≤140 m² · exenta</span></div>
-    <div class="tab" data-scenario="medB">Med. · Máximo<span class="sub">~165 m² · sin DFL 2</span></div>
+    <div class="tab" data-scenario="medB">Idea · Máximo<span class="sub">gris · 2 pisos</span></div>
   </div>
 
   <label><input type="checkbox" id="t-terrain" checked /> <span class="legend" style="background:#7a8a52"></span> Terreno (lote irregular)</label>
@@ -167,14 +167,14 @@ const SCENARIOS = {
     paleta: 'med', fence: false, pergola: true,
   },
   medB: {
-    nombre: 'Mediterráneo · Máximo',
-    descripcion: 'Sin DFL 2 · contribuciones desde inicio',
+    nombre: 'Idea gris · Máximo',
+    descripcion: 'Cubo gris moderno · 2 pisos completos',
     cubo:    { ancho: 7.82, fondo: 3.0, alto: 2.9, pisos: 2 },
     ampBack: { ancho: 7.82, fondo: 1.3, alto: 2.7 },
     ampLatL: { ancho: 0.76, fondo: 9.73, alto: 2.7 },
     ampLatR: { ancho: 0.76, fondo: 9.73, alto: 2.7 },
     cierraPatioInt: true,                                         // rellena patio + vol piso 2 arriba
-    paleta: 'med', fence: false, pergola: false,
+    paleta: 'idea', fence: false, pergola: false,
   },
 };
 const M2_ACTUAL = 103.77;
@@ -905,20 +905,21 @@ function buildNeighbors() {
   // ── Reja frontal de cada vecina (al frente de su lote) ───────────────────
   function rejaFrontal(xStart, xEnd) {
     const fierroM = mat(0x222222, { metal: 0.4, rough: 0.5 });
-    const altReja = 2.0;
+    const altReja = 2.35;
     const ancho = xEnd - xStart;
     // Travesaños horizontales sup/inf
-    for (const y of [0.2, altReja - 0.1]) {
+    for (const y of [0.28, altReja - 0.32]) {
       const t = box(ancho, 0.06, 0.04, 0x222222);
       t.position.set(xStart + ancho / 2, y, 0.05);
       groups.neighbors.add(t);
     }
     // Barrotes verticales
-    const n = Math.floor(ancho / 0.12);
+    const n = Math.floor(ancho / 0.16);
     for (let i = 0; i < n; i++) {
       const x = xStart + (i + 0.5) * (ancho / n);
-      const b = new THREE.Mesh(new THREE.BoxGeometry(0.025, altReja + 0.15, 0.025), fierroM);
-      b.position.set(x, (altReja + 0.15) / 2, 0.05);
+      const b = new THREE.Mesh(new THREE.BoxGeometry(0.035, altReja + 0.22, 0.035), fierroM);
+      b.position.set(x, (altReja + 0.22) / 2, 0.05);
+      b.rotation.z = (i % 3 - 1) * 0.025;
       b.castShadow = true;
       groups.neighbors.add(b);
     }
