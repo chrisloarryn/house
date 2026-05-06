@@ -529,6 +529,7 @@ function buildRoof(paleta) {
   const e = 0.24;
   const yTipMain = yBase + L.casa.techoMainAlt;
   const tejaMat = mat(p.teja, { rough: paleta === 'med' ? 0.95 : 0.5, metal: paleta === 'med' ? 0 : 0.3 });
+  const trimColor = paleta === 'med' ? 0x8a6a3a : 0x242424;
 
   function plano(verts) {
     const g = new THREE.BufferGeometry();
@@ -572,6 +573,20 @@ function buildRoof(paleta) {
       x0, yBase, zFace,
       xMid, yTip, zFace,
     ]));
+
+    const trimDepth = 0.08;
+    const zTrim = zFace + (toBack ? -trimDepth : trimDepth);
+    const base = new THREE.Mesh(new THREE.BoxGeometry(x1 - x0 + 0.22, 0.08, 0.08), mat(trimColor));
+    base.position.set(xMid, yBase - 0.02, zTrim);
+    groups.roof.add(base);
+
+    const rafterLen = Math.hypot((x1 - x0) / 2, alt);
+    for (const side of [-1, 1]) {
+      const rafter = new THREE.Mesh(new THREE.BoxGeometry(0.09, rafterLen + 0.18, 0.08), mat(trimColor));
+      rafter.position.set(xMid + side * (x1 - x0) / 4, yBase + alt / 2, zTrim);
+      rafter.rotation.z = -side * Math.atan2((x1 - x0) / 2, alt);
+      groups.roof.add(rafter);
+    }
   }
 
   // Cubierta principal: cumbrera paralela a la calle, como en elevaciones laterales.
@@ -610,15 +625,26 @@ function buildRoof(paleta) {
   const gb = L.casa.gablePosterior;
   gableFrontal(cx + g1.x, cx + g1.x + g1.ancho, cz - e, g1.fondo, g1.alt, true);
   gableFrontal(cx + g2.x, cx + g2.x + g2.ancho, cz - e, g2.fondo, g2.alt, true);
-  gableFrontal(cx + gb.x, cx + gb.x + gb.ancho, cz + f + e, gb.fondo, gb.alt, false);
+  if (gb) gableFrontal(cx + gb.x, cx + gb.x + gb.ancho, cz + f + e, gb.fondo, gb.alt, false);
 
-  const aleroM = paleta === 'med' ? 0x8a6a3a : 0x2a2a2a;
+  const aleroM = trimColor;
   const aleroIzq = box(0.16, 0.06, f + 0.5, aleroM);
   aleroIzq.position.set(cx - 0.08, yBase - 0.03, cz + f / 2);
   groups.roof.add(aleroIzq);
   const aleroDer = box(0.16, 0.06, f + 0.5, aleroM);
   aleroDer.position.set(cx + w + 0.08, yBase - 0.03, cz + f / 2);
   groups.roof.add(aleroDer);
+
+  const canalFront = box(w + 0.7, 0.08, 0.08, aleroM);
+  canalFront.position.set(cx + w / 2, yBase - 0.02, cz - e - 0.03);
+  groups.roof.add(canalFront);
+  const canalBack = box(w + 0.7, 0.08, 0.08, aleroM);
+  canalBack.position.set(cx + w / 2, yBase - 0.02, cz + f + e + 0.03);
+  groups.roof.add(canalBack);
+
+  const cumbrera = box(w + 0.55, 0.07, 0.10, aleroM);
+  cumbrera.position.set(cx + w / 2, yTipMain + 0.02, cz + f / 2);
+  groups.roof.add(cumbrera);
 
   // Solo en mediterráneo: pequeño ojo de buey en el frontón frontal principal.
   if (paleta === 'med') {
