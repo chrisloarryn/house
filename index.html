@@ -90,11 +90,12 @@ const L = {
   // Alturas: peak +6.70 (≈ alto1+alto2 + 1.5), alero +5.20.
   casa: {
     ancho: 6.30, fondo: 9.73, alto1: 2.7, alto2: 2.5,
-    volIzq: { ancho: 4.00, fondo: 9.73, gableAlt: 1.50 },     // full fondo, gable principal
-    volDer: { ancho: 2.30, fondo: 4.78, gableAlt: 0.55 },     // fondo corto, gable secundario discreto
-    peakOffsetX: 3.40,                                         // peak gable principal: x relativo al cx, ligeramente off-center
+    // Anchos cercanos al 50/50 → los dos peaks se ven más cercanos en la fachada
+    // Pendientes de gable ~30-35° para no ser puntiagudos
+    volIzq: { ancho: 3.60, fondo: 9.73, gableAlt: 1.20 },     // peak +6.40
+    volDer: { ancho: 2.70, fondo: 4.78, gableAlt: 0.85 },     // peak +6.05 (diferencia más sutil)
   },
-  techo: { alt: 1.50 },
+  techo: { alt: 1.20 },
 };
 
 // ── Paletas por estilo ─────────────────────────────────────────────────────
@@ -608,26 +609,15 @@ function buildRoof(paleta) {
   aleroBackDer.position.set(cx + wL + wR / 2, yBase - 0.03, cz + fR + 0.15);
   groups.roof.add(aleroBackDer);
 
-  // Ventanita decorativa en frontón principal (centrada en vol IZQ)
-  const xMidL = cx + wL / 2;
-  const yVent = yBase + L.casa.volIzq.gableAlt * 0.6;
+  // Solo en mediterráneo: pequeño ojo de buey en el frontón principal (decorativo)
   if (paleta === 'med') {
+    const xMidL = cx + L.casa.volIzq.ancho / 2;
+    const yVent = yBase + L.casa.volIzq.gableAlt * 0.6;
     const ojo = new THREE.Mesh(new THREE.CircleGeometry(0.22, 24), mat(0x1a1a1a, { rough: 0.4 }));
     ojo.position.set(xMidL, yVent, cz - 0.02);
     groups.roof.add(ojo);
-  } else {
-    // Ventana cuadrada de 4 cuadritos (visible en la foto real)
-    const cuadro = box(0.38, 0.38, 0.04, p.vidrio || 0x6a8aa8);
-    cuadro.position.set(xMidL, yVent, cz - 0.025);
-    groups.roof.add(cuadro);
-    const cruzM = mat(p.marco || 0xeeeeee, { rough: 0.6 });
-    const h1 = new THREE.Mesh(new THREE.BoxGeometry(0.40, 0.03, 0.05), cruzM);
-    h1.position.set(xMidL, yVent, cz - 0.018);
-    groups.roof.add(h1);
-    const v1 = new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.40, 0.05), cruzM);
-    v1.position.set(xMidL, yVent, cz - 0.018);
-    groups.roof.add(v1);
   }
+  // Para 'actual' e 'idea' no agregamos ventana decorativa (no aparece clara en la foto)
 }
 
 // ── Casas vecinas pareadas (mismas dimensiones reales que la casa) ─────────
