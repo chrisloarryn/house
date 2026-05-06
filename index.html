@@ -80,7 +80,10 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 //   • Volumen IZQ (principal): más ancho, gable más alto, ventana grande del living
 //   • Volumen DER (secundario): más angosto, gable más bajo, puerta + ventanita arriba
 const L = {
-  lote: { frente: 7.82, fondoIzq: 17.0, fondoDer: 14.05 },
+  // NOTA: el lote real es trapezoidal (fondoIzq=17.0, fondoDer=14.05) per cadastral.
+  // Para visualización lo simplificamos a RECTANGULAR usando 14.05 (el fondo más
+  // conservador). El "extra" de 4.27m del lado izq queda como patio adicional no modelado.
+  lote: { frente: 7.82, fondoIzq: 14.05, fondoDer: 14.05 },
   antejardinMin: 3.0,
   // Casa Laurel: 6.30 × 9.73, 2 pisos. UN gable principal asimétrico (cumbrera
   // frente-fondo, peak ligeramente desplazado). La L-shape se mantiene en
@@ -151,10 +154,8 @@ const SCENARIOS = {
     descripcion: 'Cubo frontal 1 piso · siding gris',
     cubo:    { ancho: 7.82, fondo: 3.0, alto: 2.7, pisos: 1 },
     ampBack: { ancho: 7.82, fondo: 1.3, alto: 2.7 },
-    // Strips laterales: fondo limitado por la diagonal trasera del lote
-    // LEFT a x=0 → fondo lote izq 17 m → strip puede llegar a 17-cz=14
-    // RIGHT a x=7.82 → fondo lote der 14.05 m → strip puede llegar a 14.05-cz=11.05
-    ampLatL: { ancho: 0.76, fondo: 14.0, alto: 2.7 },
+    // Strips laterales: fondo = lote.fondo - antejardín = 14.05 - 3 = 11.05
+    ampLatL: { ancho: 0.76, fondo: 11.0, alto: 2.7 },
     ampLatR: { ancho: 0.76, fondo: 11.0, alto: 2.7 },
     cierraPatioInt: true,
     paleta: 'idea', fence: false, pergola: false,
