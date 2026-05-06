@@ -82,17 +82,19 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 const L = {
   lote: { frente: 7.82, fondoIzq: 17.0, fondoDer: 14.05 },
   antejardinMin: 3.0,
-  // Casa Laurel: L-SHAPE en planta. Sup. piso 1 = 49.90 m² (no 61 que daría un
-  // rectángulo). Vol IZQ = 4.00×9.73 (full fondo) + Vol DER = 2.30×4.78 (solo
-  // mitad frontal). El back-right corner es PATIO INTERIOR.
-  // Alturas de la elevación principal: peak grande +6.70, peak chico +5.72, alero ≈ +5.20.
-  // La casa real es MIRROR del plano → vol grande queda a la IZQUIERDA.
+  // Casa Laurel: 6.30 × 9.73, 2 pisos. UN gable principal asimétrico (cumbrera
+  // frente-fondo, peak ligeramente desplazado). La L-shape se mantiene en
+  // planta (vol DER fondo recortado) pero el techo es UN único gable que
+  // cubre el volumen principal (vol IZQ). Sobre vol DER (cuando existe) hay
+  // una caída del mismo techo o una continuación.
+  // Alturas: peak +6.70 (≈ alto1+alto2 + 1.5), alero +5.20.
   casa: {
     ancho: 6.30, fondo: 9.73, alto1: 2.7, alto2: 2.5,
-    volIzq: { ancho: 4.00, fondo: 9.73, gableAlt: 1.50 },     // full fondo
-    volDer: { ancho: 2.30, fondo: 4.78, gableAlt: 0.55 },     // solo frontal
+    volIzq: { ancho: 4.00, fondo: 9.73, gableAlt: 1.50 },     // full fondo, gable principal
+    volDer: { ancho: 2.30, fondo: 4.78, gableAlt: 0.55 },     // fondo corto, gable secundario discreto
+    peakOffsetX: 3.40,                                         // peak gable principal: x relativo al cx, ligeramente off-center
   },
-  techo: { alt: 1.50 },                                         // compatibilidad legacy
+  techo: { alt: 1.50 },
 };
 
 // ── Paletas por estilo ─────────────────────────────────────────────────────
