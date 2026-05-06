@@ -101,12 +101,12 @@ const L = {
 // ── Paletas por estilo ─────────────────────────────────────────────────────
 const PAL = {
   actual: {                              // colores reales de la foto
-    estuco1:  0xece0c4,                  // estuco arena claro piso 1
-    siding2:  0xb8a988,                  // siding beige piso 2
-    teja:     0x4a4a4e,                  // techo metálico gris oscuro
-    marco:    0xe8d8b8,
-    puerta:   0x9a8a72,
-    vidrio:   0x7a95b0,
+    estuco1:  0xe6dfcf,                  // estuco crema claro piso 1
+    siding2:  0x9a8b68,                  // siding beige oliva piso 2
+    teja:     0x232426,                  // techo metálico grafito
+    marco:    0xd7c8a8,
+    puerta:   0x8b7c64,
+    vidrio:   0x6f858f,
   },
   idea: {                                // gris moderno como referencia
     estuco1:  0x9a9a9c,                  // gris medio piso 1 (existente repintado)
@@ -275,6 +275,19 @@ function buildTerrain() {
   ground.receiveShadow = true;
   groups.terrain.add(ground);
 
+  // Antejardín real: tierra compactada con acceso pavimentado hacia la puerta.
+  const frontSoil = new THREE.Mesh(new THREE.PlaneGeometry(L.lote.frente - 0.3, cz - 0.25), mat(0x6c5134, { rough: 1 }));
+  frontSoil.rotation.x = -Math.PI / 2;
+  frontSoil.position.set(L.lote.frente / 2, 0.012, cz / 2 + 0.1);
+  frontSoil.receiveShadow = true;
+  groups.terrain.add(frontSoil);
+
+  const path = new THREE.Mesh(new THREE.PlaneGeometry(1.25, cz + 0.25), mat(0xc8c0b0, { rough: 0.95 }));
+  path.rotation.x = -Math.PI / 2;
+  path.position.set(L.lote.frente - 1.0, 0.018, cz / 2 - 0.05);
+  path.receiveShadow = true;
+  groups.terrain.add(path);
+
   // Acera
   const acera = new THREE.Mesh(new THREE.PlaneGeometry(L.lote.frente + 8, 2), mat(0xc8c0b0, { rough: 1 }));
   acera.rotation.x = -Math.PI / 2;
@@ -346,15 +359,25 @@ function buildPerimeter() {
     groups.perimeter.add(banda);
   }
 
-  // Pandereta visible en el antejardín izquierdo, como la foto frontal.
+  // Pandereta de bloques visible en el antejardín izquierdo, más baja que el deslinde trasero.
   const frenteMuro = 3.0;
-  const anteL = box(grosor, altMuro, frenteMuro, 0xb2b0aa);
-  anteL.position.set(grosor / 2, altMuro / 2, frenteMuro / 2);
+  const altAnte = 1.35;
+  const anteL = box(grosor, altAnte, frenteMuro, 0xb7b3aa);
+  anteL.position.set(grosor / 2, altAnte / 2, frenteMuro / 2);
   groups.perimeter.add(anteL);
-  for (let h of [0.45, 0.9, 1.35]) {
+  for (let h of [0.42, 0.84, 1.26]) {
     const banda = box(frenteMuro - 0.12, 0.025, grosor + 0.02, 0x87837c);
     banda.position.set(grosor / 2, h, frenteMuro / 2);
     banda.rotation.y = Math.PI / 2;
+    groups.perimeter.add(banda);
+  }
+
+  const frontBase = box(L.lote.frente, 0.85, 0.12, 0xb7b3aa);
+  frontBase.position.set(L.lote.frente / 2, 0.425, 0.08);
+  groups.perimeter.add(frontBase);
+  for (let h of [0.28, 0.56]) {
+    const banda = box(L.lote.frente - 0.1, 0.02, 0.13, 0x87837c);
+    banda.position.set(L.lote.frente / 2, h, 0.0);
     groups.perimeter.add(banda);
   }
 }
@@ -397,6 +420,10 @@ function buildExisting(paleta) {
 
   groups.existing.add(place(box(w, a1, f, p.estuco1), cx, 0, cz));
   groups.existing.add(place(box(w, a2, f, p.siding2), cx, a1, cz));
+
+  const zocalo = box(w + 0.03, 0.38, 0.08, 0xd8d0be);
+  zocalo.position.set(cx + w / 2, 0.19, cz - 0.045);
+  groups.existing.add(zocalo);
 
   const bandaCol = paleta === 'actual' ? 0xa89880
                  : paleta === 'idea'   ? 0x707070
@@ -471,6 +498,19 @@ function buildExisting(paleta) {
   puerta.castShadow = true;
   groups.existing.add(puerta);
 
+  // Acceso derecho ligeramente retraído y techado, como la foto frontal.
+  const porchX = cx + w - 0.52;
+  const porchW = 1.08;
+  const recess = box(porchW, 2.45, 0.03, 0x6f614f);
+  recess.position.set(porchX, 1.225, cz - 0.015);
+  groups.existing.add(recess);
+  const porchSide = box(0.12, 2.55, 0.75, 0xd8d0be);
+  porchSide.position.set(cx + w - 0.06, 1.275, cz + 0.35);
+  groups.existing.add(porchSide);
+  const porchCeil = box(porchW, 0.12, 0.72, 0xd8d0be);
+  porchCeil.position.set(porchX, 2.46, cz + 0.30);
+  groups.existing.add(porchCeil);
+
   const puertaLineMat = mat(0x6a5a48, { rough: 0.7 });
   for (const xL of [-puertaW / 3, puertaW / 3]) {
     const ln = new THREE.Mesh(new THREE.BoxGeometry(0.015, puertaH - 0.15, 0.005), puertaLineMat);
@@ -484,7 +524,11 @@ function buildExisting(paleta) {
   groups.existing.add(manija);
 
   ventanaSimple(0.28, 1.95, puertaX - 0.62, 1.05, cz - 0.025);
-  ventanaConMarco(1.95, 1.52, cx + 2.12, 1.30, cz - 0.04, 0.22);
+
+  const frontFrame = box(2.35, 1.92, 0.10, 0xb6aa96);
+  frontFrame.position.set(cx + 2.12, 1.30, cz - 0.055);
+  groups.existing.add(frontFrame);
+  ventanaConMarco(1.95, 1.52, cx + 2.12, 1.30, cz - 0.09, 0.12);
 
   const escalonM = mat(0xc8c0b0, { rough: 0.95 });
   for (let i = 0; i < 3; i++) {
@@ -682,6 +726,27 @@ function buildRoof(paleta) {
   const cumbrera = box(w + 0.55, 0.07, 0.10, aleroM);
   cumbrera.position.set(cx + w / 2, yTipMain + 0.02, cz + f / 2);
   groups.roof.add(cumbrera);
+
+  if (paleta === 'actual' || paleta === 'idea') {
+    const ribM = mat(0x151617, { metal: 0.4, rough: 0.55 });
+    const frontSlope = Math.atan2(L.casa.techoMainAlt, f / 2 + e);
+    const backSlope = -frontSlope;
+    for (const t of [0.22, 0.42, 0.62, 0.82]) {
+      const zFront = (cz - e) * (1 - t) + (cz + f / 2) * t;
+      const yFront = yBase * (1 - t) + yTipMain * t + 0.025;
+      const ribF = new THREE.Mesh(new THREE.BoxGeometry(w + 0.55, 0.025, 0.035), ribM);
+      ribF.position.set(cx + w / 2, yFront, zFront);
+      ribF.rotation.x = frontSlope;
+      groups.roof.add(ribF);
+
+      const zBack = (cz + f + e) * (1 - t) + (cz + f / 2) * t;
+      const yBack = yBase * (1 - t) + yTipMain * t + 0.025;
+      const ribB = new THREE.Mesh(new THREE.BoxGeometry(w + 0.55, 0.025, 0.035), ribM);
+      ribB.position.set(cx + w / 2, yBack, zBack);
+      ribB.rotation.x = backSlope;
+      groups.roof.add(ribB);
+    }
+  }
 
   // Solo en mediterráneo: pequeño ojo de buey en el frontón frontal principal.
   if (paleta === 'med') {
