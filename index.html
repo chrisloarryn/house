@@ -377,8 +377,8 @@ function buildFence() {
     b.castShadow = true;
     groups.fence.add(b);
   }
-  // Puerta peatonal hacia la derecha, alineada con la puerta real.
-  const portonX = L.lote.frente - 1.0;
+  // Puerta negra centrada en el tramo frontal del lote.
+  const portonX = L.lote.frente / 2;
   const marcoPort = box(0.9, altReja, 0.07, 0x151515);
   marcoPort.position.set(portonX, altReja / 2, 0.035);
   groups.fence.add(marcoPort);
