@@ -80,10 +80,9 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 //   • Volumen IZQ (principal): más ancho, gable más alto, ventana grande del living
 //   • Volumen DER (secundario): más angosto, gable más bajo, puerta + ventanita arriba
 const L = {
-  // NOTA: el lote real es trapezoidal (fondoIzq=17.0, fondoDer=14.05) per cadastral.
-  // Para visualización lo simplificamos a RECTANGULAR usando 14.05 (el fondo más
-  // conservador). El "extra" de 4.27m del lado izq queda como patio adicional no modelado.
-  lote: { frente: 7.82, fondoIzq: 14.05, fondoDer: 14.05 },
+  // En la práctica el lote es RECTANGULAR (no trapezoidal como mostraba el plano cadastral).
+  // Fondo real: 17 m × 7.82 m de frente.
+  lote: { frente: 7.82, fondoIzq: 17.0, fondoDer: 17.0 },
   antejardinMin: 3.0,
   // Casa Laurel: 6.30 × 9.73, 2 pisos. UN gable principal asimétrico (cumbrera
   // frente-fondo, peak ligeramente desplazado). La L-shape se mantiene en
@@ -431,18 +430,27 @@ function buildExisting(paleta) {
   const vidrioMat = mat(p.vidrio, { metal: 0.4, rough: 0.15, opacity: 0.85 });
   const marcoMat = mat(p.marco, { rough: 0.6 });
 
-  // Ventana con marco saliente (estuco) — replica el marco visible en la foto real
-  const ventanaConMarco = (w, h, x, y, z, salienteMarco = 0.18) => {
-    // Saliente de estuco alrededor (visible en piso 1 ventana del living)
-    const sal = box(w + salienteMarco * 2, h + salienteMarco * 2, 0.05, p.estuco1);
-    sal.position.set(x, y, z + 0.005);
+  // Ventana con marco saliente (estuco) — el marco saliente blanco-cremoso de la foto
+  // Es CLARAMENTE más claro que el muro y SOBRESALE 8-10 cm formando un bisel.
+  const ventanaConMarco = (w, h, x, y, z, salienteMarco = 0.22) => {
+    // Color del saliente: BLANCO-CREMA, más claro que el estuco del muro
+    const colorSaliente = paleta === 'actual' ? 0xf6ecd6
+                        : paleta === 'idea'   ? 0xe8e8e8
+                        : 0xfaf2dc;
+    const salMat = mat(colorSaliente, { rough: 0.85 });
+    // Saliente: caja gruesa que se proyecta hacia adelante 0.10
+    const sal = new THREE.Mesh(
+      new THREE.BoxGeometry(w + salienteMarco * 2, h + salienteMarco * 2, 0.12), salMat);
+    sal.position.set(x, y, z + 0.06);
+    sal.castShadow = true; sal.receiveShadow = true;
     groups.existing.add(sal);
-    // Marco de la ventana (color marco)
-    const marco = new THREE.Mesh(new THREE.BoxGeometry(w + 0.10, h + 0.10, 0.04), marcoMat);
-    marco.position.set(x, y, z + 0.03);
+    // Marco interno de la ventana (color marco normal)
+    const marco = new THREE.Mesh(new THREE.BoxGeometry(w + 0.08, h + 0.08, 0.05), marcoMat);
+    marco.position.set(x, y, z + 0.13);
     groups.existing.add(marco);
+    // Vidrio
     const vidrio = new THREE.Mesh(new THREE.BoxGeometry(w, h, 0.04), vidrioMat);
-    vidrio.position.set(x, y, z + 0.04);
+    vidrio.position.set(x, y, z + 0.16);
     groups.existing.add(vidrio);
   };
   const ventanaSimple = (w, h, x, y, z) => {
@@ -453,20 +461,33 @@ function buildExisting(paleta) {
     groups.existing.add(marco, vidrio);
   };
 
-  // Ventana grande del living (en volumen IZQ, piso 1) con marco saliente de estuco
-  ventanaConMarco(2.2, 1.6, cx + wL / 2, 1.55, cz - 0.04);
-  // Ventanita pequeña arriba a la izquierda (visible en foto si se mira con detalle, omitida)
+  // Ventana grande del living (PISO 1, vol IZQ): proporciones más cuadradas como foto
+  // h=1.5 w=1.7 → algo cuadrada con marco saliente blanco prominente
+  ventanaConMarco(1.7, 1.5, cx + wL / 2, 1.45, cz - 0.04);
 
-  // Puerta de acceso (en volumen DER, piso 1)
-  const puertaW = 0.95, puertaH = 2.15;
+  // Puerta de acceso (en vol DER, piso 1) - color cream sólido sin marco prominente
+  const puertaW = 0.90, puertaH = 2.10;
   const puertaX = cx + wL + wR / 2;
-  const puerta = box(puertaW, puertaH, 0.06, p.puerta);
-  puerta.position.set(puertaX, puertaH / 2, cz - 0.03);
+  const puertaCol = paleta === 'actual' ? 0xb8a48a
+                  : paleta === 'idea'   ? 0x383838
+                  : p.puerta;
+  const puertaMat = mat(puertaCol, { rough: 0.7 });
+  const puerta = new THREE.Mesh(new THREE.BoxGeometry(puertaW, puertaH, 0.07), puertaMat);
+  puerta.position.set(puertaX, puertaH / 2, cz - 0.035);
+  puerta.castShadow = true;
   groups.existing.add(puerta);
-  // Marco de la puerta
-  const marcoP = box(puertaW + 0.18, puertaH + 0.10, 0.06, p.marco);
-  marcoP.position.set(puertaX, puertaH / 2 + 0.05, cz - 0.02);
-  groups.existing.add(marcoP);
+  // Líneas verticales de la puerta paneleada
+  const puertaLineMat = mat(0x6a5a48, { rough: 0.7 });
+  for (const xL of [-puertaW/3, puertaW/3]) {
+    const ln = new THREE.Mesh(new THREE.BoxGeometry(0.015, puertaH - 0.15, 0.005), puertaLineMat);
+    ln.position.set(puertaX + xL, puertaH / 2, cz - 0.07);
+    groups.existing.add(ln);
+  }
+  // Manija
+  const manija = new THREE.Mesh(new THREE.SphereGeometry(0.035, 12, 12),
+                                 mat(0x808080, { metal: 0.6, rough: 0.4 }));
+  manija.position.set(puertaX + puertaW / 2 - 0.12, puertaH / 2, cz - 0.08);
+  groups.existing.add(manija);
 
   // Escalones de hormigón frente a la puerta
   const escalonM = mat(0xc8c0b0, { rough: 0.95 });
