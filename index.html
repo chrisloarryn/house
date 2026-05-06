@@ -919,54 +919,6 @@ function buildBack(sc) {
   groups.back.add(vidrio);
 }
 
-// ── Relleno del PATIO INTERIOR (back-right de la L-shape) ──────────────────
-// El vol DER tiene fondo 4.78m, dejando un hueco de 2.30 × 4.95m al fondo.
-// Las ampliaciones (idea/medA/medB) cierran ese hueco con un volumen nuevo.
-function buildPatioInfill(sc) {
-  if (!sc.cierraPatioInt) return;
-  const p = PAL[sc.paleta];
-  const isMed = sc.paleta === 'med';
-  const colorBase = isMed ? p.estuco1 : p.cubo;
-  const colorBand = isMed ? p.cuboBand : 0xeeeeee;
-
-  const wL = L.casa.volIzq.ancho, fR = L.casa.volDer.fondo;
-  const wR = L.casa.volDer.ancho, fL = L.casa.volIzq.fondo;
-  const huecoX = cx + wL;                                        // 4.76
-  const huecoZ = cz + fR;                                        // 7.78
-  const huecoW = wR;                                             // 2.30
-  const huecoF = fL - fR;                                        // 4.95
-  const altoNuevo = L.casa.alto1;                                // 2.70 (1 piso)
-
-  // Volumen de relleno (1 piso, techo plano)
-  groups.patio.add(place(box(huecoW, altoNuevo, huecoF, colorBase),
-                         huecoX, 0, huecoZ));
-  // Cornisa superior
-  const cornisa = box(huecoW + 0.1, 0.18, huecoF + 0.1, colorBand);
-  cornisa.position.set(huecoX + huecoW / 2, altoNuevo + 0.09, huecoZ + huecoF / 2);
-  groups.patio.add(cornisa);
-
-  // Ventana al patio (la cara que da al patio trasero, +Z)
-  const vidrioMat = mat(p.vidrio || 0x6a8aa8, { metal: 0.4, rough: 0.15, opacity: 0.85 });
-  const marcoMat = mat(p.marco || 0xeeeeee, { rough: 0.6 });
-  const vw = huecoW - 0.4, vh = altoNuevo - 0.7;
-  const marcoV = new THREE.Mesh(new THREE.BoxGeometry(vw + 0.12, vh + 0.12, 0.04), marcoMat);
-  marcoV.position.set(huecoX + huecoW / 2, vh / 2 + 0.3, huecoZ + huecoF + 0.005);
-  groups.patio.add(marcoV);
-  const vidrio = new THREE.Mesh(new THREE.BoxGeometry(vw, vh, 0.04), vidrioMat);
-  vidrio.position.set(huecoX + huecoW / 2, vh / 2 + 0.3, huecoZ + huecoF + 0.025);
-  groups.patio.add(vidrio);
-
-  // En medB: piso 2 sobre el relleno
-  if (sc.cubo && sc.cubo.pisos === 2) {
-    groups.patio.add(place(box(huecoW, L.casa.alto2, huecoF, p.siding2 || colorBase),
-                           huecoX, altoNuevo + 0.18, huecoZ));
-    const cornisa2 = box(huecoW + 0.1, 0.18, huecoF + 0.1, colorBand);
-    cornisa2.position.set(huecoX + huecoW / 2,
-                          altoNuevo + 0.18 + L.casa.alto2 + 0.09, huecoZ + huecoF / 2);
-    groups.patio.add(cornisa2);
-  }
-}
-
 // ── Ampliaciones laterales (76 cm casa-medianera) ──────────────────────────
 function buildLat(sc) {
   const p = PAL[sc.paleta];
@@ -1008,7 +960,6 @@ function applyScenario(key) {
   clearGroup(groups.cube2);
   clearGroup(groups.back);
   clearGroup(groups.lat);
-  clearGroup(groups.patio);
   clearGroup(groups.pergola);
   clearGroup(groups.fence);
 
@@ -1017,7 +968,6 @@ function applyScenario(key) {
   buildCubo(sc);
   buildBack(sc);
   buildLat(sc);
-  buildPatioInfill(sc);
   buildPergola(sc);
   if (sc.fence) buildFence();
 
@@ -1025,11 +975,7 @@ function applyScenario(key) {
   const m2back = sc.ampBack ? sc.ampBack.ancho * sc.ampBack.fondo : 0;
   const m2lat = (sc.ampLatL ? sc.ampLatL.ancho * sc.ampLatL.fondo : 0)
               + (sc.ampLatR ? sc.ampLatR.ancho * sc.ampLatR.fondo : 0);
-  // Patio interior: 2.30 × 4.95 = 11.4 m² (× 2 pisos en medB)
-  const huecoArea = L.casa.volDer.ancho * (L.casa.volIzq.fondo - L.casa.volDer.fondo);
-  const pisosPatio = (sc.cubo && sc.cubo.pisos === 2) ? 2 : 1;
-  const m2patio = sc.cierraPatioInt ? huecoArea * pisosPatio : 0;
-  const m2nuevo = m2cubo + m2back + m2lat + m2patio;
+  const m2nuevo = m2cubo + m2back + m2lat;
   const m2total = M2_ACTUAL + m2nuevo;
   const okDfl = m2total <= TOPE_DFL2;
   const contribAnual = okDfl ? 0 : Math.max(0, (85 - 47)) * 1e6 * 0.00933;
@@ -1041,7 +987,6 @@ function applyScenario(key) {
     Cubo frontal${sc.cubo ? ' (×' + sc.cubo.pisos + ')' : ''}: ${m2cubo > 0 ? '+' + m2cubo.toFixed(1) + ' m²' : '—'}<br>
     Ampl. trasera: ${m2back > 0 ? '+' + m2back.toFixed(1) + ' m²' : '—'}<br>
     Ampl. laterales: ${m2lat > 0 ? '+' + m2lat.toFixed(1) + ' m²' : '—'}<br>
-    Cierre patio interior${pisosPatio === 2 ? ' (×2)' : ''}: ${m2patio > 0 ? '+' + m2patio.toFixed(1) + ' m²' : '—'}<br>
     <b>Total: ${m2total.toFixed(1)} m²</b>
     <span class="${okDfl ? 'ok' : 'ko'}">${okDfl ? '✓ DFL 2 OK' : '✗ pierde DFL 2'}</span><br>
     Contribuciones est.: ${okDfl ? '$0 (exento)' : '~$' + Math.round(contribAnual / 1000) + ' k/año'}
