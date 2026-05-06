@@ -1133,23 +1133,28 @@ function buildLat(sc) {
   const isMed = sc.paleta === 'med';
   const colorBase = isMed ? p.estuco1 : p.cubo;
   const colorBand = isMed ? p.cuboBand : 0xeeeeee;
+  const muroGrosor = 0.15;
+  const xInteriorIzq = muroGrosor;
+  const xInteriorDer = L.lote.frente - muroGrosor;
 
   // Strip izquierdo: x=0 a x=cx (0.76 m), de cz a cz+casa.fondo
   if (sc.ampLatL) {
     const a = sc.ampLatL;
-    groups.lat.add(place(box(a.ancho, a.alto, a.fondo, colorBase), 0, 0, cz));
+    const ancho = Math.max(0, cx - xInteriorIzq);
+    groups.lat.add(place(box(ancho, a.alto, a.fondo, colorBase), xInteriorIzq, 0, cz));
     // Cornisa
-    const cor = box(a.ancho + 0.05, 0.18, a.fondo, colorBand);
-    cor.position.set(a.ancho / 2, a.alto + 0.09, cz + a.fondo / 2);
+    const cor = box(ancho, 0.18, a.fondo, colorBand);
+    cor.position.set(xInteriorIzq + ancho / 2, a.alto + 0.09, cz + a.fondo / 2);
     groups.lat.add(cor);
   }
   // Strip derecho: x=cx+casa.ancho a x=lote.frente, de cz a cz+casa.fondo
   if (sc.ampLatR) {
     const a = sc.ampLatR;
     const x0 = cx + L.casa.ancho;
-    groups.lat.add(place(box(a.ancho, a.alto, a.fondo, colorBase), x0, 0, cz));
-    const cor = box(a.ancho + 0.05, 0.18, a.fondo, colorBand);
-    cor.position.set(x0 + a.ancho / 2, a.alto + 0.09, cz + a.fondo / 2);
+    const ancho = Math.max(0, xInteriorDer - x0);
+    groups.lat.add(place(box(ancho, a.alto, a.fondo, colorBase), x0, 0, cz));
+    const cor = box(ancho, 0.18, a.fondo, colorBand);
+    cor.position.set(x0 + ancho / 2, a.alto + 0.09, cz + a.fondo / 2);
     groups.lat.add(cor);
   }
 }
