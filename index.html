@@ -315,18 +315,18 @@ function buildTerrain() {
 function buildPerimeter() {
   const altMuro = 2.0;
   const grosor = 0.15;
-  // Los muros laterales comienzan en z=cz (antejardín): antes de eso solo hay reja/cubo.
-  const fondoR = L.lote.fondoDer - cz;
-  const fondoI = L.lote.fondoIzq - cz;
+  // Los deslindes laterales llegan hasta la reja frontal.
+  const fondoR = L.lote.fondoDer;
+  const fondoI = L.lote.fondoIzq;
 
   // Lateral derecho (dentro del lote)
   const muroR = box(grosor, altMuro, fondoR, 0xa8a098);
-  muroR.position.set(L.lote.frente - grosor / 2, altMuro / 2, cz + fondoR / 2);
+  muroR.position.set(L.lote.frente - grosor / 2, altMuro / 2, fondoR / 2);
   groups.perimeter.add(muroR);
 
   // Lateral izquierdo (dentro del lote)
   const muroL = box(grosor, altMuro, fondoI, 0xa8a098);
-  muroL.position.set(grosor / 2, altMuro / 2, cz + fondoI / 2);
+  muroL.position.set(grosor / 2, altMuro / 2, fondoI / 2);
   groups.perimeter.add(muroL);
 
   // Muro fondo
@@ -341,7 +341,7 @@ function buildPerimeter() {
   // Bandas horizontales en muro derecho
   for (let h of [0.6, 1.2, 1.8]) {
     const banda = box(fondoR - 0.1, 0.02, grosor + 0.01, 0x807870);
-    banda.position.set(L.lote.frente - grosor / 2, h, cz + fondoR / 2);
+    banda.position.set(L.lote.frente - grosor / 2, h, fondoR / 2);
     banda.rotation.y = Math.PI / 2;
     groups.perimeter.add(banda);
   }
