@@ -42,7 +42,7 @@ export const SCENARIOS: Record<ScenarioKey, Scenario> = {
     ampBack: { ancho: 6.30, alto: 2.7, fondo: 3.5 },
     cierraPatioInt: true,
     pergola: false,
-    fence: false,
+    fence: true,
   },
   medA: {
     name: 'Mediterráneo · DFL 2',
