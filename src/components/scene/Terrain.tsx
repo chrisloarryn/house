@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import * as THREE from 'three';
 import { L, cz } from '../../config/constants';
+import { useStore } from '../../store/useStore';
 
 export function Terrain() {
   const shape = useMemo(() => {
@@ -13,7 +14,9 @@ export function Terrain() {
     return s;
   }, []);
 
+  const scenario = useStore(state => state.scenario);
   const perimPts = useMemo(() => {
+
     return [
       new THREE.Vector3(0, 0.06, 0),
       new THREE.Vector3(L.lote.frente, 0.06, 0),
@@ -26,10 +29,10 @@ export function Terrain() {
   return (
     <group>
       {/* Pasto/Base */}
-      <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
-        <shapeGeometry args={[shape]} />
-        <meshStandardMaterial color={0x7a8a52} roughness={1} />
-      </mesh>
+        <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
+          <shapeGeometry args={[shape]} />
+          <meshStandardMaterial color={scenario === 'actual' ? 0x9b9b9b : 0x7a8a52} roughness={1} />
+        </mesh>
 
       {/* Tierra antejardin */}
       <mesh position={[L.lote.frente / 2, 0.012, cz / 2 + 0.1]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
