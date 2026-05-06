@@ -148,9 +148,12 @@ const SCENARIOS = {
     descripcion: 'Cubo frontal 1 piso · siding gris',
     cubo:    { ancho: 7.82, fondo: 3.0, alto: 2.7, pisos: 1 },
     ampBack: { ancho: 7.82, fondo: 1.3, alto: 2.7 },
-    ampLatL: { ancho: 0.76, fondo: 9.73, alto: 2.7 },
-    ampLatR: { ancho: 0.76, fondo: 9.73, alto: 2.7 },
-    cierraPatioInt: true,                                         // RELLENA el patio interior (L-shape)
+    // Strips laterales: fondo limitado por la diagonal trasera del lote
+    // LEFT a x=0 → fondo lote izq 17 m → strip puede llegar a 17-cz=14
+    // RIGHT a x=7.82 → fondo lote der 14.05 m → strip puede llegar a 14.05-cz=11.05
+    ampLatL: { ancho: 0.76, fondo: 14.0, alto: 2.7 },
+    ampLatR: { ancho: 0.76, fondo: 11.0, alto: 2.7 },
+    cierraPatioInt: true,
     paleta: 'idea', fence: false, pergola: false,
   },
   medA: {
