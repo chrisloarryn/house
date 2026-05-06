@@ -43,20 +43,20 @@ export const SCENARIOS: Record<ScenarioKey, Scenario> = {
     cierraPatioInt: true,
     pergola: false,
     fence: true,
-  },
-  medA: {
-    name: 'Mediterráneo · DFL 2',
-    paleta: 'med',
-    // Configuración idéntica a la de Idea·Máximo, pero con paleta mediterránea
-    cubo: { ancho: 7.82, alto: 2.7, fondo: 3.6, pisos: 1 }, // solo primer piso (ver nota abajo)
-    ampLatL: { ancho: 0.76, alto: 2.7, fondo: 9.73 },
-    ampLatR: { ancho: 0.76, alto: 2.7, fondo: 9.73 },
-    ampBack: { ancho: 6.30, alto: 2.7, fondo: 3.5 },
-    cierraPatioInt: true,
-    pergola: false,
-    fence: false,
-  },
-  medB: {
+   },
+   medA: {
+     name: 'Mediterráneo · DFL 2',
+     paleta: 'med',
+     // Configuración idéntica a Idea Ref pero con paleta mediterránea
+     cubo: { ancho: 7.82, alto: 2.7, fondo: 3.6, pisos: 1 },
+     ampLatL: { ancho: 0.76, alto: 2.7, fondo: 9.73 },
+     ampLatR: { ancho: 0.76, alto: 2.7, fondo: 9.73 },
+     ampBack: { ancho: 6.30, alto: 2.7, fondo: 3.5 },
+     cierraPatioInt: true,
+     pergola: false,
+     fence: true,
+   },
+   medB: {
     name: 'Mediterráneo · 2 Pisos',
     paleta: 'med',
     cubo: { ancho: 7.82, alto: 2.7, fondo: 3.6, pisos: 2 },
@@ -65,6 +65,6 @@ export const SCENARIOS: Record<ScenarioKey, Scenario> = {
     ampBack: { ancho: 6.30, alto: 2.7, fondo: 3.5 },
     cierraPatioInt: true,
     pergola: false,
-    fence: false,
+    fence: true,
   }
 };
