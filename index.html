@@ -76,26 +76,24 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 // ── Datos del lote y casa existente (plano oficial Vivienda Laurel 2020) ───
-// La casa está compuesta de DOS volúmenes adyacentes con gables independientes:
-//   • Volumen IZQ (principal): más ancho, gable más alto, ventana grande del living
-//   • Volumen DER (secundario): más angosto, gable más bajo, puerta + ventanita arriba
+// El objetivo es aproximar la volumetría que se ve en las plantas y elevaciones.
+// La lectura más útil del plano es un volumen continuo de 6.30 × 9.73 m con
+// una cubierta principal longitudinal y gables secundarios al frente y atrás.
 const L = {
   // En la práctica el lote es RECTANGULAR (no trapezoidal como mostraba el plano cadastral).
   // Fondo real: 17 m × 7.82 m de frente.
   lote: { frente: 7.82, fondoIzq: 17.0, fondoDer: 17.0 },
   antejardinMin: 3.0,
-  // Casa Laurel: 6.30 × 9.73, 2 pisos. UN gable principal asimétrico (cumbrera
-  // frente-fondo, peak ligeramente desplazado). La L-shape se mantiene en
-  // planta (vol DER fondo recortado) pero el techo es UN único gable que
-  // cubre el volumen principal (vol IZQ). Sobre vol DER (cuando existe) hay
-  // una caída del mismo techo o una continuación.
-  // Alturas: peak +6.70 (≈ alto1+alto2 + 1.5), alero +5.20.
+  // `volIzq` y `volDer` se conservan para cálculos de escenarios conceptuales.
+  // La casa existente ya no se dibuja como una L trasera profunda.
   casa: {
     ancho: 6.30, fondo: 9.73, alto1: 2.7, alto2: 2.5,
-    // Anchos cercanos al 50/50 → los dos peaks se ven más cercanos en la fachada
-    // Pendientes de gable ~30-35° para no ser puntiagudos
-    volIzq: { ancho: 3.60, fondo: 9.73, gableAlt: 1.20 },     // peak +6.40
-    volDer: { ancho: 2.70, fondo: 4.78, gableAlt: 0.85 },     // peak +6.05 (diferencia más sutil)
+    volIzq: { ancho: 3.45, fondo: 9.73, gableAlt: 1.45 },
+    volDer: { ancho: 2.85, fondo: 9.73, gableAlt: 0.72 },
+    techoMainAlt: 1.50,
+    gableFrenteIzq: { x: 0.35, ancho: 3.10, fondo: 1.20, alt: 1.50 },
+    gableFrenteDer: { x: 3.90, ancho: 2.05, fondo: 0.95, alt: 0.72 },
+    gablePosterior: { x: 2.10, ancho: 2.10, fondo: 1.05, alt: 1.18 },
   },
   techo: { alt: 1.20 },
 };
