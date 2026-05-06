@@ -91,9 +91,9 @@ const L = {
     volIzq: { ancho: 3.45, fondo: 9.73, gableAlt: 1.45 },
     volDer: { ancho: 2.85, fondo: 9.73, gableAlt: 0.72 },
     techoMainAlt: 1.50,
-    gableFrenteIzq: { x: 0.35, ancho: 3.10, fondo: 1.20, alt: 1.50 },
-    gableFrenteDer: { x: 3.90, ancho: 2.05, fondo: 0.95, alt: 0.72 },
-    gablePosterior: { x: 2.10, ancho: 2.10, fondo: 1.05, alt: 1.18 },
+    gableFrenteIzq: { x: 0.22, ancho: 3.35, fondo: 1.28, alt: 1.50 },
+    gableFrenteDer: { x: 3.55, ancho: 2.55, fondo: 1.05, alt: 0.58 },
+    gablePosterior: null,
   },
   techo: { alt: 1.20 },
 };
@@ -656,30 +656,25 @@ function buildRoof(paleta) {
   }
 }
 
-// ── Casas vecinas pareadas (mismas dimensiones reales que la casa) ─────────
+// ── Casas vecinas pareadas: misma silueta, detalle reducido ────────────────
 function buildNeighbors() {
-  // Misma tipología Laurel: ancho 6.30, fondo 9.73, 2 pisos, dos gables asimétricos
   const w = L.casa.ancho, f = L.casa.fondo;
   const a1 = L.casa.alto1, a2 = L.casa.alto2;
   const yBase = a1 + a2;
 
-  const wL = L.casa.volIzq.ancho, wR = L.casa.volDer.ancho;
-  const gAltL = L.casa.volIzq.gableAlt, gAltR = L.casa.volDer.gableAlt;
-
   const mkVecina = (xOriginLote, mirror) => {
     const v = new THREE.Group();
     const cxV = (7.82 - w) / 2;
-    // Si "mirror", invertimos los volúmenes (puerta hacia el otro lado)
-    const wA = mirror ? wR : wL;       // volumen del lado izquierdo del frente vecino
-    const wB = mirror ? wL : wR;
-    const gA = mirror ? gAltR : gAltL;
-    const gB = mirror ? gAltL : gAltR;
+    const e = 0.20;
+    const roofAlt = 1.25;
+    const yTip = yBase + roofAlt;
 
-    // Volúmenes
-    v.add(place(box(wA, a1, f, 0xb8a890), cxV, 0, 0));
-    v.add(place(box(wA, a2, f, 0xa89880), cxV, a1, 0));
-    v.add(place(box(wB, a1, f, 0xb8a890), cxV + wA, 0, 0));
-    v.add(place(box(wB, a2, f, 0xa89880), cxV + wA, a1, 0));
+    v.add(place(box(w, a1, f, 0xa89470), cxV, 0, 0));
+    v.add(place(box(w, a2, f, 0x9f9276), cxV, a1, 0));
+
+    const banda = box(w + 0.04, 0.06, f + 0.04, 0x81745e);
+    banda.position.set(cxV + w / 2, a1 + 0.03, f / 2);
+    v.add(banda);
 
     const tejaMat = mat(0x3a3a3e, { rough: 0.6, metal: 0.3 });
     function plano(verts) {
@@ -690,33 +685,98 @@ function buildNeighbors() {
       m.castShadow = true; m.receiveShadow = true;
       return m;
     }
-    function fronton(x0, x1, zPos, gAlt, sign) {
-      const xMid_ = (x0 + x1) / 2, yTip_ = yBase + gAlt;
+    function triangulo(verts) {
       const g = new THREE.BufferGeometry();
-      const vv = sign > 0
-        ? [x0, yBase, zPos,  x1, yBase, zPos,  xMid_, yTip_, zPos]
-        : [x1, yBase, zPos,  x0, yBase, zPos,  xMid_, yTip_, zPos];
-      g.setAttribute('position', new THREE.BufferAttribute(new Float32Array(vv), 3));
+      g.setAttribute('position', new THREE.BufferAttribute(new Float32Array(verts), 3));
       g.computeVertexNormals();
       const m = new THREE.Mesh(g, mat(0xa89880));
       m.castShadow = true;
       return m;
     }
-    function gable(x0, x1, gAlt) {
-      const xMid_ = (x0 + x1) / 2, yTip_ = yBase + gAlt;
+    function gableFront(g) {
+      const gx = mirror ? w - g.x - g.ancho : g.x;
+      const x0 = cxV + gx;
+      const x1 = x0 + g.ancho;
+      const xMid = (x0 + x1) / 2;
+      const yG = yBase + g.alt * 0.86;
+      const zInner = g.fondo * 0.9;
       v.add(plano([
-        x0, yBase, 0,  x0, yBase, f,  xMid_, yTip_, f,
-        x0, yBase, 0,  xMid_, yTip_, f,  xMid_, yTip_, 0,
+        x0, yBase, -e,
+        x0, yBase, zInner,
+        xMid, yG, zInner,
+        x0, yBase, -e,
+        xMid, yG, zInner,
+        xMid, yG, -e,
       ]));
       v.add(plano([
-        x1, yBase, 0,  xMid_, yTip_, 0,  xMid_, yTip_, f,
-        x1, yBase, 0,  xMid_, yTip_, f,  x1, yBase, f,
+        x1, yBase, -e,
+        xMid, yG, -e,
+        xMid, yG, zInner,
+        x1, yBase, -e,
+        xMid, yG, zInner,
+        x1, yBase, zInner,
       ]));
-      v.add(fronton(x0, x1, 0, gAlt, -1));
-      v.add(fronton(x0, x1, f, gAlt, 1));
+      v.add(triangulo([
+        x1, yBase, -e,
+        x0, yBase, -e,
+        xMid, yG, -e,
+      ]));
     }
-    gable(cxV, cxV + wA, gA);
-    gable(cxV + wA, cxV + wA + wB, gB);
+
+    v.add(plano([
+      cxV - e, yBase, -e,
+      cxV + w + e, yBase, -e,
+      cxV + w + e, yTip, f / 2,
+      cxV - e, yBase, -e,
+      cxV + w + e, yTip, f / 2,
+      cxV - e, yTip, f / 2,
+    ]));
+    v.add(plano([
+      cxV - e, yTip, f / 2,
+      cxV + w + e, yTip, f / 2,
+      cxV + w + e, yBase, f + e,
+      cxV - e, yTip, f / 2,
+      cxV + w + e, yBase, f + e,
+      cxV - e, yBase, f + e,
+    ]));
+    v.add(triangulo([
+      cxV - e, yBase, -e,
+      cxV - e, yBase, f + e,
+      cxV - e, yTip, f / 2,
+    ]));
+    v.add(triangulo([
+      cxV + w + e, yBase, f + e,
+      cxV + w + e, yBase, -e,
+      cxV + w + e, yTip, f / 2,
+    ]));
+    gableFront(L.casa.gableFrenteIzq);
+    gableFront(L.casa.gableFrenteDer);
+
+    const trim = mat(0x202020, { rough: 0.7 });
+    const ridge = new THREE.Mesh(new THREE.BoxGeometry(w + 0.45, 0.06, 0.08), trim);
+    ridge.position.set(cxV + w / 2, yTip + 0.02, f / 2);
+    v.add(ridge);
+
+    function win(ww, hh, x, y) {
+      const marco = new THREE.Mesh(new THREE.BoxGeometry(ww + 0.10, hh + 0.10, 0.04), mat(0xc8b894));
+      marco.position.set(x, y, -0.025);
+      const vidrio = new THREE.Mesh(new THREE.BoxGeometry(ww, hh, 0.05), mat(0x5c6f78, { opacity: 0.7 }));
+      vidrio.position.set(x, y, -0.05);
+      v.add(marco, vidrio);
+    }
+    const doorX = cxV + (mirror ? 2.25 : 4.05);
+    const door = new THREE.Mesh(new THREE.BoxGeometry(0.82, 2.0, 0.06), mat(0x7b6b55));
+    door.position.set(doorX, 1.0, -0.04);
+    v.add(door);
+    win(1.35, 1.1, cxV + (mirror ? 4.8 : 1.8), a1 + 1.28);
+    win(1.55, 1.25, cxV + (mirror ? 1.4 : 5.0), 1.25);
+
+    for (let i = 1; i < 10; i++) {
+      const y = a1 + 0.12 + i * 0.2;
+      const line = new THREE.Mesh(new THREE.BoxGeometry(w - 0.1, 0.01, 0.01), mat(0x786d59));
+      line.position.set(cxV + w / 2, y, -0.03);
+      v.add(line);
+    }
 
     v.position.set(xOriginLote, 0, cz);
     return v;
