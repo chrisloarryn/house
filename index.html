@@ -1052,6 +1052,7 @@ function applyScenario(key) {
   groups.cube2.visible = document.getElementById('t-cube2').checked && !!sc.cubo && sc.cubo.pisos === 2;
   groups.back.visible = document.getElementById('t-back').checked && !!sc.ampBack;
   groups.lat.visible = document.getElementById('t-lat').checked && (!!sc.ampLatL || !!sc.ampLatR);
+  groups.patio.visible = document.getElementById('t-patio').checked && sc.cierraPatioInt;
   groups.pergola.visible = document.getElementById('t-pergola').checked && sc.pergola;
   groups.fence.visible = document.getElementById('t-fence').checked && sc.fence;
 }
@@ -1061,7 +1062,8 @@ const toggleMap = {
   't-terrain': groups.terrain, 't-perimeter': groups.perimeter,
   't-existing': groups.existing, 't-roof': groups.roof,
   't-neighbors': groups.neighbors, 't-cube1': groups.cube1, 't-cube2': groups.cube2,
-  't-back': groups.back, 't-lat': groups.lat, 't-pergola': groups.pergola, 't-fence': groups.fence,
+  't-back': groups.back, 't-lat': groups.lat, 't-patio': groups.patio,
+  't-pergola': groups.pergola, 't-fence': groups.fence,
 };
 Object.entries(toggleMap).forEach(([id, g]) => {
   document.getElementById(id).addEventListener('change', e => {
@@ -1070,6 +1072,7 @@ Object.entries(toggleMap).forEach(([id, g]) => {
     else if (id === 't-cube2') g.visible = e.target.checked && !!sc.cubo && sc.cubo.pisos === 2;
     else if (id === 't-back') g.visible = e.target.checked && !!sc.ampBack;
     else if (id === 't-lat') g.visible = e.target.checked && (!!sc.ampLatL || !!sc.ampLatR);
+    else if (id === 't-patio') g.visible = e.target.checked && sc.cierraPatioInt;
     else if (id === 't-pergola') g.visible = e.target.checked && sc.pergola;
     else if (id === 't-fence') g.visible = e.target.checked && sc.fence;
     else g.visible = e.target.checked;
