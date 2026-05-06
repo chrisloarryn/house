@@ -148,13 +148,13 @@ Híbrido validado por foto de referencia (`images/ideas/052be7c4...`):
 ---
 
 ## 6. Stack del visualizador 3D
-- **Three.js** (motor) — implementación standalone en `casa-3d.html`.
+- **Three.js** (motor) — implementación standalone en `index.html`.
 - Para React: portar a **React Three Fiber + drei** + Vite + TS.
 - Unidades: metros. Origen en esquina frontal-izquierda del lote.
 - Datos centralizados en el objeto `D` al inicio del script (única fuente de verdad).
 
 ### Uso
-Abrir `casa-3d.html` en navegador. Toggles para mostrar/ocultar cada capa, vistas predefinidas (frontal/iso/planta).
+Abrir `index.html` en navegador. Toggles para mostrar/ocultar cada capa, vistas predefinidas (frontal/iso/planta).
 
 ---
 
