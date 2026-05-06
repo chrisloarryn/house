@@ -372,20 +372,12 @@ function buildPerimeter() {
     groups.perimeter.add(banda);
   }
 
-  const frontBase = box(L.lote.frente, 0.85, 0.12, 0xb7b3aa);
-  frontBase.position.set(L.lote.frente / 2, 0.425, 0.08);
-  groups.perimeter.add(frontBase);
-  for (let h of [0.28, 0.56]) {
-    const banda = box(L.lote.frente - 0.1, 0.02, 0.13, 0x87837c);
-    banda.position.set(L.lote.frente / 2, h, 0.0);
-    groups.perimeter.add(banda);
-  }
 }
 
 // ── Reja frontal metálica vertical (estado actual) ─────────────────────────
 function buildFence() {
   const fierroM = mat(0x222222, { metal: 0.4, rough: 0.5 });
-  const altReja = 2.35;
+  const altReja = 2.0;
   // Travesaños horizontales
   for (const y of [0.28, altReja - 0.32]) {
     const t = box(L.lote.frente, 0.06, 0.04, 0x222222);
@@ -396,8 +388,8 @@ function buildFence() {
   const n = Math.floor(L.lote.frente / 0.16);
   for (let i = 0; i < n; i++) {
     const x = (i + 0.5) * (L.lote.frente / n);
-    const b = new THREE.Mesh(new THREE.BoxGeometry(0.035, altReja + 0.22, 0.035), fierroM);
-    b.position.set(x, (altReja + 0.22) / 2, 0.05);
+    const b = new THREE.Mesh(new THREE.BoxGeometry(0.035, altReja + 0.12, 0.035), fierroM);
+    b.position.set(x, (altReja + 0.12) / 2, 0.05);
     b.rotation.z = (i % 3 - 1) * 0.025;
     b.castShadow = true;
     groups.fence.add(b);
@@ -905,7 +897,7 @@ function buildNeighbors() {
   // ── Reja frontal de cada vecina (al frente de su lote) ───────────────────
   function rejaFrontal(xStart, xEnd) {
     const fierroM = mat(0x222222, { metal: 0.4, rough: 0.5 });
-    const altReja = 2.35;
+    const altReja = 2.0;
     const ancho = xEnd - xStart;
     // Travesaños horizontales sup/inf
     for (const y of [0.28, altReja - 0.32]) {
@@ -917,8 +909,8 @@ function buildNeighbors() {
     const n = Math.floor(ancho / 0.16);
     for (let i = 0; i < n; i++) {
       const x = xStart + (i + 0.5) * (ancho / n);
-      const b = new THREE.Mesh(new THREE.BoxGeometry(0.035, altReja + 0.22, 0.035), fierroM);
-      b.position.set(x, (altReja + 0.22) / 2, 0.05);
+      const b = new THREE.Mesh(new THREE.BoxGeometry(0.035, altReja + 0.12, 0.035), fierroM);
+      b.position.set(x, (altReja + 0.12) / 2, 0.05);
       b.rotation.z = (i % 3 - 1) * 0.025;
       b.castShadow = true;
       groups.neighbors.add(b);
