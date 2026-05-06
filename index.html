@@ -315,39 +315,35 @@ function buildTerrain() {
 
 // ── Muros perimetrales (deslindes de hormigón visibles en las fotos) ───────
 function buildPerimeter() {
-  const muroMat = mat(0xa8a098, { rough: 0.95 });
   const altMuro = 2.0;
   const grosor = 0.15;
+  // Los muros laterales comienzan en z=cz (antejardín): antes de eso solo hay reja/cubo.
+  const fondoR = L.lote.fondoDer - cz;
+  const fondoI = L.lote.fondoIzq - cz;
 
-  // Muro fondo (de x=0 a x=lote.frente, en z=fondoDer del lado derecho)
-  // Lote irregular: muro fondo derecho a z=fondoDer, izquierdo a z=fondoIzq
-  // Para simplificar: dibujo muros laterales que conectan los puntos del lote.
-
-  // Muros perimetrales — TODOS DENTRO del lote (no sobresalen del polígono)
-  // Lateral derecho: dentro del lote, justo en x = frente - grosor/2
-  const muroR = box(grosor, altMuro, L.lote.fondoDer, 0xa8a098);
-  muroR.position.set(L.lote.frente - grosor / 2, altMuro / 2, L.lote.fondoDer / 2);
+  // Lateral derecho (dentro del lote)
+  const muroR = box(grosor, altMuro, fondoR, 0xa8a098);
+  muroR.position.set(L.lote.frente - grosor / 2, altMuro / 2, cz + fondoR / 2);
   groups.perimeter.add(muroR);
 
-  // Lateral izquierdo: dentro del lote, justo en x = grosor/2
-  const muroL = box(grosor, altMuro, L.lote.fondoIzq, 0xa8a098);
-  muroL.position.set(grosor / 2, altMuro / 2, L.lote.fondoIzq / 2);
+  // Lateral izquierdo (dentro del lote)
+  const muroL = box(grosor, altMuro, fondoI, 0xa8a098);
+  muroL.position.set(grosor / 2, altMuro / 2, cz + fondoI / 2);
   groups.perimeter.add(muroL);
 
-  // Muro fondo: dentro del lote, justo antes de z = lote.fondo
+  // Muro fondo
   const dx = L.lote.frente, dz = L.lote.fondoDer - L.lote.fondoIzq;
   const lenInc = Math.sqrt(dx * dx + dz * dz);
   const muroInc = box(lenInc, altMuro, grosor, 0xa8a098);
-  // Posicionar el muro JUSTO DENTRO del lote, no sobre la línea
   muroInc.position.set(L.lote.frente / 2, altMuro / 2,
                        (L.lote.fondoIzq + L.lote.fondoDer) / 2 - grosor / 2);
   muroInc.rotation.y = -Math.atan2(dz, dx);
   groups.perimeter.add(muroInc);
 
-  // Textura de bloques de hormigón: bandas horizontales tenues sobre el muro derecho
+  // Bandas horizontales en muro derecho
   for (let h of [0.6, 1.2, 1.8]) {
-    const banda = box(L.lote.fondoDer - 0.1, 0.02, grosor + 0.01, 0x807870);
-    banda.position.set(L.lote.frente - grosor / 2, h, L.lote.fondoDer / 2);
+    const banda = box(fondoR - 0.1, 0.02, grosor + 0.01, 0x807870);
+    banda.position.set(L.lote.frente - grosor / 2, h, cz + fondoR / 2);
     banda.rotation.y = Math.PI / 2;
     groups.perimeter.add(banda);
   }
@@ -520,10 +516,10 @@ function buildExisting(paleta) {
     groups.existing.add(baj);
   }
 
-  // ── Outlines de recintos interiores (visibles desde vista PLANTA) ────────
-  // Basado en planta arquitectura piso 1 del plano oficial
-  const yLine = (a1 + a2) + L.casa.volIzq.gableAlt + 0.02;     // por encima de todo
-  const lineMat = new THREE.LineBasicMaterial({ color: 0x884422, transparent: true, opacity: 0.85 });
+  // ── Outlines de recintos interiores (solo visibles desde vista planta) ──────
+  // Se dibujan a ras del suelo para no interferir con el techo desde ángulos oblicuos
+  const yLine = 0.02;
+  const lineMat = new THREE.LineBasicMaterial({ color: 0x884422, transparent: true, opacity: 0.7 });
   function rect(x, z, w, d) {
     const pts = [
       new THREE.Vector3(x, yLine, z),
@@ -534,17 +530,14 @@ function buildExisting(paleta) {
     ];
     return new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), lineMat);
   }
-  // Recintos derivados del plano (piso 1):
-  // Vol IZQ (4.00 × 9.73) → estar 3.0 + comedor 2.7 + escalera 1.5 + cocina 2.5 = 9.7
-  // Vol DER (2.30 × 4.78) → dormitorio 4 / oficina 3.0 + acceso/baño v. 1.78 = 4.78
   const wL_in = wL - 0.2, wR_in = wR - 0.2;
-  groups.existing.add(rect(cx + 0.1, cz + 0.1, wL_in, 3.0));                          // estar
-  groups.existing.add(rect(cx + 0.1, cz + 3.2, wL_in, 2.7));                          // comedor
-  groups.existing.add(rect(cx + 0.1, cz + 6.0, wL_in, 1.5));                          // escalera (en vol IZQ)
-  groups.existing.add(rect(cx + 0.1, cz + 7.6, wL_in, fL - 7.7));                     // cocina (al fondo)
-  groups.existing.add(rect(cx + wL + 0.1, cz + 0.1, wR_in, 3.0));                     // dorm 4 / oficina
-  groups.existing.add(rect(cx + wL + 0.1, cz + 3.2, wR_in, 1.45));                    // acceso + baño visita
-  // Patio interior (back-right corner) - rectángulo punteado para destacarlo
+  groups.existing.add(rect(cx + 0.1, cz + 0.1, wL_in, 3.0));
+  groups.existing.add(rect(cx + 0.1, cz + 3.2, wL_in, 2.7));
+  groups.existing.add(rect(cx + 0.1, cz + 6.0, wL_in, 1.5));
+  groups.existing.add(rect(cx + 0.1, cz + 7.6, wL_in, fL - 7.7));
+  groups.existing.add(rect(cx + wL + 0.1, cz + 0.1, wR_in, 3.0));
+  groups.existing.add(rect(cx + wL + 0.1, cz + 3.2, wR_in, 1.45));
+  // Patio interior marcado a ras del suelo
   const patioMat = new THREE.LineDashedMaterial({ color: 0x4a8a4a, dashSize: 0.2, gapSize: 0.1 });
   const patioPts = [
     new THREE.Vector3(cx + wL, yLine, cz + fR),
@@ -558,12 +551,13 @@ function buildExisting(paleta) {
   groups.existing.add(patioLine);
 }
 
-// ── Techo: DOS gables asimétricos (uno por volumen, fondos distintos) ──────
+// ── Techo: faldón principal longitudinal + gables secundarios ───────────────
 function buildRoof(paleta) {
   const p = PAL[paleta];
   const yBase = L.casa.alto1 + L.casa.alto2;
-  const wL = L.casa.volIzq.ancho, fL = L.casa.volIzq.fondo;
-  const wR = L.casa.volDer.ancho, fR = L.casa.volDer.fondo;
+  const w = L.casa.ancho, f = L.casa.fondo;
+  const e = 0.24;
+  const yTipMain = yBase + L.casa.techoMainAlt;
   const tejaMat = mat(p.teja, { rough: paleta === 'med' ? 0.95 : 0.5, metal: paleta === 'med' ? 0 : 0.3 });
 
   function plano(verts) {
@@ -574,74 +568,96 @@ function buildRoof(paleta) {
     m.castShadow = true; m.receiveShadow = true;
     return m;
   }
-  function fronton(x0, x1, zPos, yBase_, yTip_, sign) {
-    const xMid_ = (x0 + x1) / 2;
+  function triangulo(verts, color = p.siding2) {
     const g = new THREE.BufferGeometry();
-    const v = sign > 0
-      ? [x0, yBase_, zPos,  x1, yBase_, zPos,  xMid_, yTip_, zPos]
-      : [x1, yBase_, zPos,  x0, yBase_, zPos,  xMid_, yTip_, zPos];
-    g.setAttribute('position', new THREE.BufferAttribute(new Float32Array(v), 3));
+    g.setAttribute('position', new THREE.BufferAttribute(new Float32Array(verts), 3));
     g.computeVertexNormals();
-    const m = new THREE.Mesh(g, mat(p.siding2));
+    const m = new THREE.Mesh(g, mat(color));
     m.castShadow = true;
     return m;
   }
 
-  // Gable a dos aguas, parametrizado en fondo
-  function gable(x0, x1, gAlt, fondoVol) {
-    const xMid_ = (x0 + x1) / 2;
-    const yTip_ = yBase + gAlt;
-    // Faldón izq
+  function gableFrontal(x0, x1, zFace, fondo, alt, toBack = true) {
+    const xMid = (x0 + x1) / 2;
+    const yTip = yBase + alt;
+    const zInner = zFace + (toBack ? fondo : -fondo);
     groups.roof.add(plano([
-      x0, yBase, cz,
-      x0, yBase, cz + fondoVol,
-      xMid_, yTip_, cz + fondoVol,
-      x0, yBase, cz,
-      xMid_, yTip_, cz + fondoVol,
-      xMid_, yTip_, cz,
+      x0, yBase, zFace,
+      x0, yBase, zInner,
+      xMid, yTip, zInner,
+      x0, yBase, zFace,
+      xMid, yTip, zInner,
+      xMid, yTip, zFace,
     ]));
-    // Faldón der
     groups.roof.add(plano([
-      x1, yBase, cz,
-      xMid_, yTip_, cz,
-      xMid_, yTip_, cz + fondoVol,
-      x1, yBase, cz,
-      xMid_, yTip_, cz + fondoVol,
-      x1, yBase, cz + fondoVol,
+      x1, yBase, zFace,
+      xMid, yTip, zFace,
+      xMid, yTip, zInner,
+      x1, yBase, zFace,
+      xMid, yTip, zInner,
+      x1, yBase, zInner,
     ]));
-    // Frontones (frente y trasero)
-    groups.roof.add(fronton(x0, x1, cz, yBase, yTip_, -1));
-    groups.roof.add(fronton(x0, x1, cz + fondoVol, yBase, yTip_, 1));
+    groups.roof.add(triangulo([
+      x1, yBase, zFace,
+      x0, yBase, zFace,
+      xMid, yTip, zFace,
+    ]));
   }
 
-  // Gable PRINCIPAL (vol IZQ) — fondo completo
-  gable(cx, cx + wL, L.casa.volIzq.gableAlt, fL);
-  // Gable SECUNDARIO (vol DER) — sólo fondo recortado
-  gable(cx + wL, cx + L.casa.ancho, L.casa.volDer.gableAlt, fR);
+  // Cubierta principal: cumbrera paralela a la calle, como en elevaciones laterales.
+  groups.roof.add(plano([
+    cx - e, yBase, cz - e,
+    cx + w + e, yBase, cz - e,
+    cx + w + e, yTipMain, cz + f / 2,
+    cx - e, yBase, cz - e,
+    cx + w + e, yTipMain, cz + f / 2,
+    cx - e, yTipMain, cz + f / 2,
+  ]));
+  groups.roof.add(plano([
+    cx - e, yTipMain, cz + f / 2,
+    cx + w + e, yTipMain, cz + f / 2,
+    cx + w + e, yBase, cz + f + e,
+    cx - e, yTipMain, cz + f / 2,
+    cx + w + e, yBase, cz + f + e,
+    cx - e, yBase, cz + f + e,
+  ]));
 
+  // Frontones laterales de la cubierta principal.
+  groups.roof.add(triangulo([
+    cx - e, yBase, cz - e,
+    cx - e, yBase, cz + f + e,
+    cx - e, yTipMain, cz + f / 2,
+  ]));
+  groups.roof.add(triangulo([
+    cx + w + e, yBase, cz + f + e,
+    cx + w + e, yBase, cz - e,
+    cx + w + e, yTipMain, cz + f / 2,
+  ]));
 
-  // Aleros laterales (vol IZQ tiene full fondo; vol DER sólo cubre fR)
+  // Hastiales secundarios del plano: dos al frente, uno centrado atrás.
+  const g1 = L.casa.gableFrenteIzq;
+  const g2 = L.casa.gableFrenteDer;
+  const gb = L.casa.gablePosterior;
+  gableFrontal(cx + g1.x, cx + g1.x + g1.ancho, cz - e, g1.fondo, g1.alt, true);
+  gableFrontal(cx + g2.x, cx + g2.x + g2.ancho, cz - e, g2.fondo, g2.alt, true);
+  gableFrontal(cx + gb.x, cx + gb.x + gb.ancho, cz + f + e, gb.fondo, gb.alt, false);
+
   const aleroM = paleta === 'med' ? 0x8a6a3a : 0x2a2a2a;
-  const aleroIzq = box(0.3, 0.06, fL + 0.4, aleroM);          // alero lateral izq (vol IZQ)
-  aleroIzq.position.set(cx - 0.15, yBase - 0.03, cz + fL / 2);
+  const aleroIzq = box(0.16, 0.06, f + 0.5, aleroM);
+  aleroIzq.position.set(cx - 0.08, yBase - 0.03, cz + f / 2);
   groups.roof.add(aleroIzq);
-  const aleroDer = box(0.3, 0.06, fR + 0.4, aleroM);          // alero lateral der (vol DER)
-  aleroDer.position.set(cx + L.casa.ancho + 0.15, yBase - 0.03, cz + fR / 2);
+  const aleroDer = box(0.16, 0.06, f + 0.5, aleroM);
+  aleroDer.position.set(cx + w + 0.08, yBase - 0.03, cz + f / 2);
   groups.roof.add(aleroDer);
-  // Alero del corte trasero del vol DER (donde termina el volumen y empieza el patio)
-  const aleroBackDer = box(wR + 0.4, 0.06, 0.3, aleroM);
-  aleroBackDer.position.set(cx + wL + wR / 2, yBase - 0.03, cz + fR + 0.15);
-  groups.roof.add(aleroBackDer);
 
-  // Solo en mediterráneo: pequeño ojo de buey en el frontón principal (decorativo)
+  // Solo en mediterráneo: pequeño ojo de buey en el frontón frontal principal.
   if (paleta === 'med') {
-    const xMidL = cx + L.casa.volIzq.ancho / 2;
-    const yVent = yBase + L.casa.volIzq.gableAlt * 0.6;
+    const xMidL = cx + g1.x + g1.ancho / 2;
+    const yVent = yBase + g1.alt * 0.58;
     const ojo = new THREE.Mesh(new THREE.CircleGeometry(0.22, 24), mat(0x1a1a1a, { rough: 0.4 }));
-    ojo.position.set(xMidL, yVent, cz - 0.02);
+    ojo.position.set(xMidL, yVent, cz - 0.04);
     groups.roof.add(ojo);
   }
-  // Para 'actual' e 'idea' no agregamos ventana decorativa (no aparece clara en la foto)
 }
 
 // ── Casas vecinas pareadas (mismas dimensiones reales que la casa) ─────────
@@ -766,8 +782,8 @@ function buildCubo(sc) {
   // Volumen base del piso 1
   groups.cube1.add(place(box(sc.cubo.ancho, sc.cubo.alto, sc.cubo.fondo, p.cubo), 0, 0, 0));
 
-  // Cornisa superior (banda blanca) — característica visible en ambas refs
-  const cornisa = box(sc.cubo.ancho + 0.1, isMed ? 0.35 : 0.22, sc.cubo.fondo + 0.1, p.cuboBand);
+  // Cornisa superior — NO sobresale del ancho del lote
+  const cornisa = box(sc.cubo.ancho, isMed ? 0.35 : 0.22, sc.cubo.fondo + 0.06, p.cuboBand);
   cornisa.position.set(sc.cubo.ancho / 2, sc.cubo.alto + (isMed ? 0.175 : 0.11), sc.cubo.fondo / 2);
   groups.cube1.add(cornisa);
 
