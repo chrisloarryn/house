@@ -912,32 +912,34 @@ function buildCubo(sc) {
   if (!sc.cubo) return;
   const p = PAL[sc.paleta];
   const isMed = sc.paleta === 'med';
+  const cuboX = 0.15;
+  const cuboW = sc.cubo.ancho - cuboX * 2;
 
   // Volumen base del piso 1
-  groups.cube1.add(place(box(sc.cubo.ancho, sc.cubo.alto, sc.cubo.fondo, p.cubo), 0, 0, 0));
+  groups.cube1.add(place(box(cuboW, sc.cubo.alto, sc.cubo.fondo, p.cubo), cuboX, 0, 0));
 
   // Cornisa superior — NO sobresale del ancho del lote
-  const cornisa = box(sc.cubo.ancho, isMed ? 0.35 : 0.22, sc.cubo.fondo + 0.06, p.cuboBand);
-  cornisa.position.set(sc.cubo.ancho / 2, sc.cubo.alto + (isMed ? 0.175 : 0.11), sc.cubo.fondo / 2);
+  const cornisa = box(cuboW, isMed ? 0.35 : 0.22, sc.cubo.fondo + 0.06, p.cuboBand);
+  cornisa.position.set(cuboX + cuboW / 2, sc.cubo.alto + (isMed ? 0.175 : 0.11), sc.cubo.fondo / 2);
   groups.cube1.add(cornisa);
 
   if (isMed) {
     // Zócalo terracota
-    const zocalo = box(sc.cubo.ancho + 0.04, 0.4, sc.cubo.fondo + 0.04, p.zocalo);
-    zocalo.position.set(sc.cubo.ancho / 2, 0.2, sc.cubo.fondo / 2);
+    const zocalo = box(cuboW, 0.4, sc.cubo.fondo + 0.04, p.zocalo);
+    zocalo.position.set(cuboX + cuboW / 2, 0.2, sc.cubo.fondo / 2);
     groups.cube1.add(zocalo);
   } else {
     // Líneas horizontales del siding (referencia gris)
     for (let i = 1; i < 12; i++) {
-      const linea = new THREE.Mesh(new THREE.BoxGeometry(sc.cubo.ancho - 0.05, 0.012, 0.01),
+      const linea = new THREE.Mesh(new THREE.BoxGeometry(cuboW - 0.05, 0.012, 0.01),
                                    mat(0x8a8a8a));
-      linea.position.set(sc.cubo.ancho / 2, i * (sc.cubo.alto / 12), 0.001);
+      linea.position.set(cuboX + cuboW / 2, i * (sc.cubo.alto / 12), 0.001);
       groups.cube1.add(linea);
     }
   }
 
   // Portón vehicular (estilo según paleta)
-  const arcoAncho = 4.3, arcoX = 0.25;
+  const arcoAncho = 4.3, arcoX = cuboX + 0.25;
   const arcoCentroX = arcoX + arcoAncho / 2;
 
   if (isMed) {
@@ -1033,15 +1035,15 @@ function buildCubo(sc) {
   // Piso 2 del cubo (sólo Med. B)
   if (sc.cubo.pisos === 2) {
     const yBase2 = sc.cubo.alto + 0.35;
-    groups.cube2.add(place(box(sc.cubo.ancho, sc.cubo.alto, sc.cubo.fondo, p.siding2), 0, yBase2, 0));
+    groups.cube2.add(place(box(cuboW, sc.cubo.alto, sc.cubo.fondo, p.siding2), cuboX, yBase2, 0));
 
-    const cornisa2 = box(sc.cubo.ancho + 0.3, 0.35, sc.cubo.fondo + 0.3, p.cuboBand);
-    cornisa2.position.set(sc.cubo.ancho / 2, yBase2 + sc.cubo.alto + 0.175, sc.cubo.fondo / 2);
+    const cornisa2 = box(cuboW, 0.35, sc.cubo.fondo + 0.3, p.cuboBand);
+    cornisa2.position.set(cuboX + cuboW / 2, yBase2 + sc.cubo.alto + 0.175, sc.cubo.fondo / 2);
     groups.cube2.add(cornisa2);
 
     // 3 ventanas con postigos
     const ventW = 0.9, ventH = 1.7;
-    const positions = [1.3, sc.cubo.ancho / 2, sc.cubo.ancho - 1.3];
+    const positions = [cuboX + 1.3, cuboX + cuboW / 2, cuboX + cuboW - 1.3];
     positions.forEach(xv => {
       const marcoV = box(ventW + 0.15, ventH + 0.15, 0.05, p.marco);
       marcoV.position.set(xv, yBase2 + 0.35 + ventH / 2, -0.005);
