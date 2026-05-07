@@ -1,6 +1,7 @@
 import React from 'react';
 import type { Ampliacion } from '../../config/scenarios';
 import type { Palette } from '../../config/palettes';
+import { L } from '../../config/constants';
 
 function Box({ position, args, color }: { position: [number, number, number], args: [number, number, number], color: number }) {
   return (
@@ -13,7 +14,7 @@ function Box({ position, args, color }: { position: [number, number, number], ar
 
 export function Cubo({ level, data, palette, isMed }: { level: number, data: Ampliacion, palette: Palette, isMed: boolean }) {
   const cuboX = 0.15; // respetando el muro izquierdo
-  const cuboW = data.ancho - cuboX * 2; // 7.52
+  const cuboW = L.lote.frente - cuboX * 2;
   const f = data.fondo; // 3.6
   const h = data.alto; // 2.7
   

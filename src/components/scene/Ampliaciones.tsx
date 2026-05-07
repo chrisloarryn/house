@@ -17,6 +17,7 @@ export function Ampliaciones({ scenario, palette, toggles }: { scenario: Scenari
   const isMed = scenario.paleta === 'med';
   const colorBase = isMed ? palette.estuco1 : palette.cubo;
   const colorBand = isMed ? palette.cuboBand : 0xeeeeee;
+  const rearDepth = L.lote.fondoIzq - (cz + L.casa.fondo);
   
   return (
     <group>
@@ -24,27 +25,27 @@ export function Ampliaciones({ scenario, palette, toggles }: { scenario: Scenari
       {toggles.back && scenario.ampBack && (
         <group>
           <Box 
-            position={[cx + scenario.ampBack.ancho / 2, scenario.ampBack.alto / 2, cz + L.casa.fondo + scenario.ampBack.fondo / 2]} 
-            args={[scenario.ampBack.ancho, scenario.ampBack.alto, scenario.ampBack.fondo]} 
+            position={[L.lote.frente / 2, scenario.ampBack.alto / 2, cz + L.casa.fondo + rearDepth / 2]} 
+            args={[L.lote.frente, scenario.ampBack.alto, rearDepth]} 
             color={colorBase} 
           />
           {/* Cornisa trasera */}
           <Box 
-            position={[cx + scenario.ampBack.ancho / 2, scenario.ampBack.alto + 0.09, cz + L.casa.fondo + scenario.ampBack.fondo / 2]} 
-            args={[scenario.ampBack.ancho + 0.05, 0.18, scenario.ampBack.fondo + 0.05]} 
+            position={[L.lote.frente / 2, scenario.ampBack.alto + 0.09, cz + L.casa.fondo + rearDepth / 2]} 
+            args={[L.lote.frente, 0.18, rearDepth + 0.05]} 
             color={colorBand} 
           />
           {/* Tejadillo si es mediterraneo */}
           {isMed && (
-            <mesh position={[cx + scenario.ampBack.ancho / 2, scenario.ampBack.alto + 0.37, cz + L.casa.fondo + scenario.ampBack.fondo / 2]} rotation={[-0.06, 0, 0]}>
-              <boxGeometry args={[scenario.ampBack.ancho + 0.3, 0.1, scenario.ampBack.fondo + 0.3]} />
+            <mesh position={[L.lote.frente / 2, scenario.ampBack.alto + 0.37, cz + L.casa.fondo + rearDepth / 2]} rotation={[-0.06, 0, 0]}>
+              <boxGeometry args={[L.lote.frente + 0.3, 0.1, rearDepth + 0.3]} />
               <meshStandardMaterial color={palette.teja} roughness={0.9} />
             </mesh>
           )}
           {/* Ventanal */}
           <Box 
-            position={[cx + scenario.ampBack.ancho / 2, (scenario.ampBack.alto - 0.7) / 2 + 0.3, cz + L.casa.fondo + scenario.ampBack.fondo + 0.01]} 
-            args={[scenario.ampBack.ancho - 1.4, scenario.ampBack.alto - 0.7, 0.04]} 
+            position={[L.lote.frente / 2, (scenario.ampBack.alto - 0.7) / 2 + 0.3, cz + L.casa.fondo + rearDepth + 0.01]} 
+            args={[L.lote.frente - 1.4, scenario.ampBack.alto - 0.7, 0.04]} 
             color={palette.marco || 0x222} 
           />
         </group>

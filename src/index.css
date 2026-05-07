@@ -63,6 +63,31 @@ body, html {
   color: #666;
 }
 
+.m2-breakdown {
+  border-top: 1px solid rgba(0,0,0,0.12);
+  margin-top: 10px;
+  padding-top: 8px;
+  min-width: 250px;
+}
+
+.m2-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  font-size: 0.78rem;
+  line-height: 1.35;
+}
+
+.m2-row.active {
+  color: #225c2f;
+}
+
+.m2-row.inactive {
+  color: #9a3b2f;
+  opacity: 0.8;
+  text-decoration: line-through;
+}
+
 /* Scenario Tabs */
 .scenario-tabs {
   display: flex;

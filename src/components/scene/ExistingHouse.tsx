@@ -30,6 +30,10 @@ export function ExistingHouse({ palette, isActual }: { palette: Palette; isActua
   const porchDepth = 1.28;
   const leftCenterX = cx + leftW / 2;
   const rightCenterX = cx + leftW + rightW / 2;
+  const leftBayLeftX = cx;
+  const leftBayRightX = cx + leftW;
+  const rightBayLeftX = cx + leftW;
+  const rightBayRightX = cx + w;
   const leftFrontZ = cz - 0.07;
   const rightFrontZ = cz + rightSetback - 0.04;
 
@@ -38,10 +42,14 @@ export function ExistingHouse({ palette, isActual }: { palette: Palette; isActua
   return (
     <group>
       {/* Piso 1: dos cuerpos reales, dejando el porche como vacío bajo el segundo piso */}
-      <Box position={[leftCenterX, a1 / 2, z]} args={[leftW, a1, f]} color={palette.estuco1} />
       <Box
-        position={[rightCenterX, a1 / 2, cz + porchDepth + (f - porchDepth) / 2]}
-        args={[rightW, a1, f - porchDepth]}
+        position={[leftCenterX, a1 / 2, cz + porchDepth + (f - porchDepth) / 2]}
+        args={[leftW, a1, f - porchDepth]}
+        color={palette.estuco1}
+      />
+      <Box
+        position={[rightCenterX, a1 / 2, z]}
+        args={[rightW, a1, f]}
         color={palette.estuco1}
       />
       
@@ -54,11 +62,11 @@ export function ExistingHouse({ palette, isActual }: { palette: Palette; isActua
       />
 
       {/* Porche retranqueado y sombra del acceso */}
-      <Box position={[cx + 5.05, a1 - 0.08, cz + porchDepth / 2]} args={[2.08, 0.16, porchDepth]} color={0x4f4a40} />
-      <Box position={[cx + 4.12, 1.35, cz + porchDepth / 2]} args={[0.16, 2.7, 0.16]} color={0xf0eadf} />
-      <Box position={[cx + 5.95, 1.35, cz + porchDepth / 2]} args={[0.16, 2.7, 0.16]} color={0xf0eadf} />
-      <Box position={[cx + 5.05, 0.04, cz + porchDepth / 2]} args={[1.9, 0.08, porchDepth]} color={0xbcb7ad} />
-      <Box position={[cx + 5.05, 1.35, cz + porchDepth + 0.03]} args={[1.65, 2.5, 0.08]} color={0xe8e4d8} />
+      <Box position={[leftCenterX, a1 - 0.08, cz + porchDepth / 2]} args={[leftW - 0.18, 0.16, porchDepth]} color={0x4f4a40} />
+      <Box position={[leftBayLeftX + 0.16, 1.35, cz + porchDepth / 2]} args={[0.16, 2.7, 0.16]} color={0xf0eadf} />
+      <Box position={[leftBayRightX - 0.16, 1.35, cz + porchDepth / 2]} args={[0.16, 2.7, 0.16]} color={0xf0eadf} />
+      <Box position={[leftCenterX, 0.04, cz + porchDepth / 2]} args={[leftW - 0.32, 0.08, porchDepth]} color={0xbcb7ad} />
+      <Box position={[leftCenterX, 1.35, cz + porchDepth + 0.03]} args={[leftW - 0.48, 2.5, 0.08]} color={0xe8e4d8} />
 
       {/* Zócalo */}
       <Box position={[leftCenterX, 0.19, cz - 0.055]} args={[leftW + 0.15, 0.38, 0.08]} color={0xd8d0be} />
@@ -87,23 +95,23 @@ export function ExistingHouse({ palette, isActual }: { palette: Palette; isActua
       <Box position={[cx + w + 0.08, a1 + a2 / 2, cz + f / 2]} args={[0.14, a2 + 0.2, 0.1]} color={0xd7d0be} />
 
       {/* Ventanas Piso 1 */}
-      <Window position={[cx + 1.93, 1.33, cz - 0.105]} args={[1.88, 1.42]} palette={palette} divisions={3} sill />
-      <Box position={[cx + 0.62, 0.88, cz - 0.11]} args={[0.18, 1.74, 0.1]} color={0xece7dd} />
-      <Box position={[cx + 3.23, 0.88, cz - 0.11]} args={[0.18, 1.74, 0.1]} color={0xece7dd} />
-      <SlidingDoor position={[cx + 1.68, 1.08, cz + f + 0.08]} args={[1.78, 2.11]} palette={palette} />
-      <SlidingDoor position={[cx + 4.72, 1.08, cz + f + 0.08]} args={[1.78, 2.11]} palette={palette} />
+      <Window position={[rightCenterX, 1.33, cz - 0.105]} args={[1.88, 1.42]} palette={palette} divisions={3} sill />
+      <Box position={[rightBayLeftX + 0.22, 0.88, cz - 0.11]} args={[0.18, 1.74, 0.1]} color={0xece7dd} />
+      <Box position={[rightBayRightX - 0.22, 0.88, cz - 0.11]} args={[0.18, 1.74, 0.1]} color={0xece7dd} />
+      <SlidingDoor position={[cx + 1.48, 1.08, cz + f + 0.08]} args={[1.78, 2.11]} palette={palette} />
+      <SlidingDoor position={[cx + 4.04, 1.08, cz + f + 0.08]} args={[1.78, 2.11]} palette={palette} />
 
       {/* Ventanas Piso 2 */}
-      <Window position={[cx + 4.9, a1 + 1.18, rightFrontZ - 0.03]} args={[1.12, 1.08]} palette={palette} divisions={2} />
+      <Window position={[rightCenterX, a1 + 1.18, rightFrontZ - 0.03]} args={[1.12, 1.08]} palette={palette} divisions={2} />
       <SideWindow position={[cx - 0.09, a1 + 0.95, cz + 2.2]} palette={palette} />
-      <Vent position={[cx + 5.9, a1 + 2.1, rightFrontZ - 0.05]} />
+      <Vent position={[rightBayRightX - 0.28, a1 + 2.1, rightFrontZ - 0.05]} />
 
       {/* Puerta principal y portón (solo en Estado Actual) */}
       {isActual && (
         <group>
-          <Door position={[cx + 5.12, 1.04, cz + porchDepth - 0.02]} />
-          <Box position={[cx + 3.56, 1.4, cz - 0.09]} args={[0.08, 2.65, 0.08]} color={0x252525} />
-          <Box position={[cx + 5.95, 1.4, cz + 0.12]} args={[0.08, 2.65, 0.08]} color={0x252525} />
+          <Door position={[leftCenterX, 1.04, cz + porchDepth - 0.02]} />
+          <Box position={[leftBayLeftX + 0.16, 1.4, cz + 0.12]} args={[0.08, 2.65, 0.08]} color={0x252525} />
+          <Box position={[leftBayRightX + 0.06, 1.4, cz - 0.09]} args={[0.08, 2.65, 0.08]} color={0x252525} />
         </group>
       )}
     </group>
