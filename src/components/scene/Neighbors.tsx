@@ -33,9 +33,9 @@ function NeighborPanderetas() {
 export function Neighbors({ palette }: { palette: Palette }) {
   const f = L.lote.frente;
   const sideSetbackFromMyLot = 2.6;
-  const sideNeighborPegadoX = L.lote.frente + L.lote.fondoDer;
+  const sideNeighborPegadoX = L.lote.frente;
   const sideNeighborSetbackX = sideNeighborPegadoX + sideSetbackFromMyLot;
-  const sideNeighborZ = L.lote.fondoDer / 2 - L.lote.frente / 2;
+  const sideNeighborZ = L.lote.fondoDer / 2 + L.lote.frente / 2;
   const sideNeighborStep = L.lote.frente;
 
   return (
@@ -50,11 +50,12 @@ export function Neighbors({ palette }: { palette: Palette }) {
         <group
           key={`side-neighbor-${i}`}
           position={[i === 0 ? sideNeighborPegadoX : sideNeighborSetbackX, 0, sideNeighborZ - i * sideNeighborStep]}
-          rotation={[0, -Math.PI / 2, 0]}
+          rotation={[0, Math.PI / 2, 0]}
         >
           <NeighborPanderetas />
           <ExistingHouse palette={palette} isActual={true} />
           <Roof palette={palette} isActual={true} />
+          <Fence />
         </group>
       ))}
     </group>
