@@ -32,7 +32,9 @@ function NeighborPanderetas() {
 
 export function Neighbors({ palette }: { palette: Palette }) {
   const f = L.lote.frente;
-  const sideNeighborX = L.lote.frente + L.lote.fondoDer;
+  const sideSetbackFromMyLot = 2.6;
+  const sideNeighborPegadoX = L.lote.frente + L.lote.fondoDer;
+  const sideNeighborSetbackX = sideNeighborPegadoX + sideSetbackFromMyLot;
   const sideNeighborZ = L.lote.fondoDer / 2 - L.lote.frente / 2;
   const sideNeighborStep = L.lote.frente;
 
@@ -47,7 +49,7 @@ export function Neighbors({ palette }: { palette: Palette }) {
       {Array.from({ length: 3 }, (_, i) => (
         <group
           key={`side-neighbor-${i}`}
-          position={[sideNeighborX, 0, sideNeighborZ + i * sideNeighborStep]}
+          position={[i === 0 ? sideNeighborPegadoX : sideNeighborSetbackX, 0, sideNeighborZ - i * sideNeighborStep]}
           rotation={[0, -Math.PI / 2, 0]}
         >
           <NeighborPanderetas />
