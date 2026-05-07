@@ -47,8 +47,15 @@ export function ExistingHouse({ palette, isActual }: { palette: Palette; isActua
       <Window position={[cx + 1.90, a1 + a2 / 2 - 0.1, cz - 0.005]} args={[1.2, 1.2]} palette={palette} />
       <Window position={[cx + 4.90, a1 + a2 / 2 - 0.1, cz - 0.005]} args={[1.2, 1.2]} palette={palette} />
 
-      {/* Puerta principal (lateral izquierda) */}
-      <Box position={[cx - 0.01, a1 / 2 - 0.1, cz + 2.0]} args={[0.04, 2.0, 0.9]} color={0x4a3a2a} />
+      {/* Puerta principal y portón (solo en Estado Actual) */}
+      {isActual && (
+        <group>
+          {/* Puerta frontal (central) */}
+          <Box position={[cx + w / 2, a1 / 2, cz - 0.02]} args={[0.9, 2.0, 0.05]} color={0x4a3a2a} />
+          {/* Portón vehicular a la derecha de la puerta */}
+          <Box position={[cx + w / 2 + 1.5, a1 / 2, cz - 0.02]} args={[2.8, 2.2, 0.05]} color={0x2a2a2a} />
+        </group>
+      )}
     </group>
   );
 }
