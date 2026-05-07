@@ -19,7 +19,15 @@ function SideStrip({ x, y, z, depth, color = 0x5f5a4b }: { x: number; y: number;
   return <Box position={[x, y, z]} args={[0.035, 0.022, depth]} color={color} />;
 }
 
-export function ExistingHouse({ palette, isActual }: { palette: Palette; isActual: boolean }) {
+export function ExistingHouse({
+  palette,
+  isActual,
+  showMudroomClosure = false,
+}: {
+  palette: Palette;
+  isActual: boolean;
+  showMudroomClosure?: boolean;
+}) {
   const w = L.casa.ancho;
   const f = L.casa.fondo;
   const a1 = L.casa.alto1;
@@ -106,6 +114,17 @@ export function ExistingHouse({ palette, isActual }: { palette: Palette; isActua
       <SideWindow position={[cx - 0.09, a1 + 0.95, cz + 2.2]} palette={palette} />
       <Vent position={[rightBayRightX - 0.28, a1 + 2.1, rightFrontZ - 0.05]} />
 
+      {/* Cierre opcional del acceso cuando no se usa el cubo frontal */}
+      {showMudroomClosure && (
+        <MudroomClosure
+          x0={rightBayLeftX + 0.06}
+          x1={rightBayRightX - 0.10}
+          z0={cz - 0.11}
+          z1={cz + porchDepth - 0.02}
+          palette={palette}
+        />
+      )}
+
       {/* Puerta principal y portón (solo en Estado Actual) */}
       {isActual && (
         <group>
@@ -114,6 +133,55 @@ export function ExistingHouse({ palette, isActual }: { palette: Palette; isActua
           <Box position={[leftBayRightX + 0.06, 1.4, cz - 0.09]} args={[0.08, 2.65, 0.08]} color={0x252525} />
         </group>
       )}
+    </group>
+  );
+}
+
+function MudroomClosure({
+  x0,
+  x1,
+  z0,
+  z1,
+  palette,
+}: {
+  x0: number;
+  x1: number;
+  z0: number;
+  z1: number;
+  palette: Palette;
+}) {
+  const w = x1 - x0;
+  const d = z1 - z0;
+  const h = 2.34;
+  const doorW = 0.82;
+  const doorH = 2.05;
+  const doorX = x0 + w * 0.52;
+  const panelW = (w - doorW) / 2;
+  const wallColor = palette.estuco1;
+
+  return (
+    <group>
+      {/* Piso del pequeño vestíbulo/zapatero */}
+      <Box position={[x0 + w / 2, 0.045, z0 + d / 2]} args={[w, 0.09, d]} color={0xbcb7ad} />
+
+      {/* Paño frontal dividido por la nueva puerta exterior */}
+      <Box position={[x0 + panelW / 2, h / 2, z0]} args={[panelW, h, 0.08]} color={wallColor} />
+      <Box position={[x1 - panelW / 2, h / 2, z0]} args={[panelW, h, 0.08]} color={wallColor} />
+      <Box position={[doorX, doorH + (h - doorH) / 2, z0]} args={[doorW + 0.16, h - doorH, 0.08]} color={wallColor} />
+
+      {/* Laterales del cierre para que el chaflán/porche baje hasta suelo */}
+      <Box position={[x0, h / 2, z0 + d / 2]} args={[0.08, h, d]} color={wallColor} />
+      <Box position={[x1, h / 2, z0 + d / 2]} args={[0.08, h, d]} color={wallColor} />
+
+      {/* Puerta exterior nueva. La puerta original queda atrás como puerta interior. */}
+      <Door position={[doorX, doorH / 2, z0 - 0.045]} />
+
+      {/* Marco y pequeño umbral exterior */}
+      <Box position={[doorX, doorH / 2, z0 - 0.075]} args={[doorW + 0.22, doorH + 0.18, 0.04]} color={0xb8ad9b} />
+      <Box position={[doorX, 0.06, z0 - 0.22]} args={[doorW + 0.42, 0.12, 0.28]} color={0x9e9588} />
+
+      {/* Remate superior alineado al bajo del segundo piso */}
+      <Box position={[x0 + w / 2, h + 0.06, z0 + d / 2]} args={[w + 0.08, 0.12, d + 0.08]} color={0x4f4a40} />
     </group>
   );
 }

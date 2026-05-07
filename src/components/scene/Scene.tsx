@@ -78,7 +78,13 @@ export function Scene() {
         {toggles.perimeter && <Perimeter />}
         {toggles.neighbors && <Neighbors palette={palette} />}
         
-        {toggles.existing && <ExistingHouse palette={palette} isActual={scenario === 'actual'} />}
+        {toggles.existing && (
+          <ExistingHouse
+            palette={palette}
+            isActual={scenario === 'actual'}
+            showMudroomClosure={scenario === 'actual' || (!!activeScenario.cubo && !toggles.cube1)}
+          />
+        )}
         {toggles.roof && <Roof palette={palette} isActual={scenario === 'actual'} />}
         
         {toggles.cube1 && activeScenario.cubo && (

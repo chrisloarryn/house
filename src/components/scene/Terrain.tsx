@@ -5,9 +5,11 @@ import { useStore } from '../../store/useStore';
 
 export function Terrain() {
   const shape = useMemo(() => {
+    const cut = L.lote.chaflanDer;
     const s = new THREE.Shape();
     s.moveTo(0, 0);
-    s.lineTo(L.lote.frente, 0);
+    s.lineTo(L.lote.frente - cut.frente, 0);
+    s.lineTo(L.lote.frente, cut.fondo);
     s.lineTo(L.lote.frente, L.lote.fondoDer);
     s.lineTo(0, L.lote.fondoIzq);
     s.lineTo(0, 0);
@@ -16,10 +18,12 @@ export function Terrain() {
 
   const scenario = useStore(state => state.scenario);
   const perimPts = useMemo(() => {
+    const cut = L.lote.chaflanDer;
 
     return [
       new THREE.Vector3(0, 0.06, 0),
-      new THREE.Vector3(L.lote.frente, 0.06, 0),
+      new THREE.Vector3(L.lote.frente - cut.frente, 0.06, 0),
+      new THREE.Vector3(L.lote.frente, 0.06, cut.fondo),
       new THREE.Vector3(L.lote.frente, 0.06, L.lote.fondoDer),
       new THREE.Vector3(0, 0.06, L.lote.fondoIzq),
       new THREE.Vector3(0, 0.06, 0),

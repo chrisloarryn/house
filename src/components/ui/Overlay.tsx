@@ -46,10 +46,19 @@ function getConstructionBlocks(scenarioKey: ScenarioKey, toggles: VisibilityTogg
 
 export function Overlay() {
   const { scenario, setScenario, view, setView, toggles, toggleVisibility, setAllToggles } = useStore();
+  const [pricePerM2, setPricePerM2] = React.useState('');
   const constructionBlocks = getConstructionBlocks(scenario, toggles);
   const additionalM2 = constructionBlocks.reduce((total, block) => total + (block.active ? block.m2 : 0), 0);
   const inactiveM2 = constructionBlocks.reduce((total, block) => total + (!block.active ? block.m2 : 0), 0);
   const totalM2 = M2_ACTUAL + additionalM2;
+  const visibleScenarios: ScenarioKey[] = ['actual', 'idea'];
+  const priceNumber = Number(pricePerM2.replace(/[^0-9.]/g, ''));
+  const totalPrice = Number.isFinite(priceNumber) && priceNumber > 0 ? additionalM2 * priceNumber : 0;
+  const moneyFormatter = new Intl.NumberFormat('es-CL', {
+    style: 'currency',
+    currency: 'CLP',
+    maximumFractionDigits: 0,
+  });
 
   const toggleConfig = [
     { key: 'terrain', label: 'Terreno y Lote' },
@@ -75,6 +84,21 @@ export function Overlay() {
           <p>Adicional diseño: +{additionalM2.toFixed(2)} m²</p>
           {inactiveM2 > 0 && <p>Bloques quitados: -{inactiveM2.toFixed(2)} m²</p>}
           <p>Total estimado: {totalM2.toFixed(2)} m²</p>
+          <div className="price-estimator">
+            <label htmlFor="price-per-m2">Valor por m²</label>
+            <input
+              id="price-per-m2"
+              type="number"
+              min="0"
+              inputMode="numeric"
+              placeholder="$ / m²"
+              value={pricePerM2}
+              onChange={(event) => setPricePerM2(event.target.value)}
+            />
+            <div className="price-total">
+              Total ampliación: <strong>{totalPrice > 0 ? moneyFormatter.format(totalPrice) : '—'}</strong>
+            </div>
+          </div>
           {constructionBlocks.length > 0 && (
             <div className="m2-breakdown">
               {constructionBlocks.map((block) => (
@@ -88,7 +112,7 @@ export function Overlay() {
         </div>
 
         <div className="scenario-tabs">
-          {(Object.keys(SCENARIOS) as ScenarioKey[]).map((key) => (
+          {visibleScenarios.map((key) => (
             <button
               key={key}
               className={`tab-btn ${scenario === key ? 'active' : ''}`}

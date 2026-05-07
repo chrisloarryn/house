@@ -63,6 +63,50 @@ body, html {
   color: #666;
 }
 
+.price-estimator {
+  display: grid;
+  grid-template-columns: 1fr 110px;
+  gap: 6px 10px;
+  align-items: center;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(0,0,0,0.12);
+  color: #444;
+  font-size: 0.82rem;
+}
+
+.price-estimator label {
+  font-weight: 600;
+}
+
+.price-estimator input {
+  width: 100%;
+  border: 1px solid rgba(0,0,0,0.18);
+  border-radius: 6px;
+  padding: 5px 7px;
+  background: rgba(255,255,255,0.86);
+  color: #333;
+  font: inherit;
+  text-align: right;
+}
+
+.price-estimator input:focus {
+  outline: 2px solid rgba(0,102,204,0.25);
+  border-color: #0066cc;
+}
+
+.price-total {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  color: #222;
+}
+
+.price-total strong {
+  color: #225c2f;
+}
+
 .m2-breakdown {
   border-top: 1px solid rgba(0,0,0,0.12);
   margin-top: 10px;

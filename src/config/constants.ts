@@ -1,5 +1,5 @@
 export const L = {
-  lote: { frente: 10.78, fondoIzq: 17.10, fondoDer: 17.10 },
+  lote: { frente: 10.78, fondoIzq: 17.10, fondoDer: 17.10, chaflanDer: { frente: 1.05, fondo: 1.0 } },
   antejardinMin: 3.0,
   casa: {
     ancho: 6.11, fondo: 9.73, alto1: 2.7, alto2: 2.5,
