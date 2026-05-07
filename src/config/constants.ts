@@ -7,7 +7,7 @@ export const L = {
     volDer: { ancho: 2.85, fondo: 9.73, gableAlt: 0.72 },
     techoMainAlt: 1.50,
     gableFrenteIzq: { x: 0.22, ancho: 3.35, fondo: 1.28, alt: 1.50 },
-    gableFrenteDer: { x: 3.55, ancho: 2.55, fondo: 1.05, alt: 0.58 },
+    gableFrenteDer: { x: 3.57, ancho: 2.95, fondo: 1.05, alt: 0.58 },
     gablePosterior: null,
   },
   techo: { alt: 1.20 },

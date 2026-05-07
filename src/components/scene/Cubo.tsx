@@ -1,7 +1,6 @@
 import React from 'react';
 import type { Ampliacion } from '../../config/scenarios';
 import type { Palette } from '../../config/palettes';
-import { L } from '../../config/constants';
 
 function Box({ position, args, color }: { position: [number, number, number], args: [number, number, number], color: number }) {
   return (

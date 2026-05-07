@@ -1,6 +1,7 @@
 import React from 'react';
-import type { Ampliacion, Scenario } from '../../config/scenarios';
+import type { Scenario } from '../../config/scenarios';
 import type { Palette } from '../../config/palettes';
+import type { VisibilityToggles } from '../../store/useStore';
 import { L, cx, cz } from '../../config/constants';
 
 function Box({ position, args, color }: { position: [number, number, number], args: [number, number, number], color: number }) {
@@ -12,7 +13,7 @@ function Box({ position, args, color }: { position: [number, number, number], ar
   );
 }
 
-export function Ampliaciones({ scenario, palette, toggles }: { scenario: Scenario, palette: Palette, toggles: any }) {
+export function Ampliaciones({ scenario, palette, toggles }: { scenario: Scenario, palette: Palette, toggles: VisibilityToggles }) {
   const isMed = scenario.paleta === 'med';
   const colorBase = isMed ? palette.estuco1 : palette.cubo;
   const colorBand = isMed ? palette.cuboBand : 0xeeeeee;

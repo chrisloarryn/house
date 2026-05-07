@@ -1,11 +1,29 @@
 import React from 'react';
 import { useStore } from '../../store/useStore';
 import { SCENARIOS } from "../../config/scenarios";
+import { L, M2_ACTUAL } from '../../config/constants';
 import type { ScenarioKey } from '../../config/scenarios';
 import type { ViewKey } from '../../store/useStore';
 
+function calculateAdditionalM2(scenarioKey: ScenarioKey) {
+  const activeScenario = SCENARIOS[scenarioKey];
+  const cuboM2 = activeScenario.cubo
+    ? activeScenario.cubo.ancho * activeScenario.cubo.fondo * (activeScenario.cubo.pisos ?? 1)
+    : 0;
+  const latM2 = [activeScenario.ampLatL, activeScenario.ampLatR]
+    .reduce((total, amp) => total + (amp ? amp.ancho * amp.fondo : 0), 0);
+  const backM2 = activeScenario.ampBack ? activeScenario.ampBack.ancho * activeScenario.ampBack.fondo : 0;
+  const patioM2 = activeScenario.cierraPatioInt
+    ? L.casa.volDer.ancho * Math.max(0, L.casa.volIzq.fondo - L.casa.volDer.fondo)
+    : 0;
+
+  return cuboM2 + latM2 + backM2 + patioM2;
+}
+
 export function Overlay() {
   const { scenario, setScenario, view, setView, toggles, toggleVisibility, setAllToggles } = useStore();
+  const additionalM2 = calculateAdditionalM2(scenario);
+  const totalM2 = M2_ACTUAL + additionalM2;
 
   const toggleConfig = [
     { key: 'terrain', label: 'Terreno y Lote' },
@@ -27,7 +45,9 @@ export function Overlay() {
       <div className="header">
         <div className="title-card">
           <h1>Casa Laurel — Masterplan</h1>
-          <p>Superficie base: 103.77 m²</p>
+          <p>Superficie base: {M2_ACTUAL.toFixed(2)} m²</p>
+          <p>Adicional diseño: +{additionalM2.toFixed(2)} m²</p>
+          <p>Total estimado: {totalM2.toFixed(2)} m²</p>
         </div>
 
         <div className="scenario-tabs">
@@ -70,6 +90,7 @@ export function Overlay() {
         <div className="view-buttons">
           {[
             { key: 'front', label: 'Frontal' },
+            { key: 'side', label: 'Lateral' },
             { key: 'iso', label: 'Isométrica' },
             { key: 'top', label: 'Planta' },
             { key: 'back', label: 'Patio' },

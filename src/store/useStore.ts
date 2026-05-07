@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import type { ScenarioKey } from '../config/scenarios';
 
-interface VisibilityToggles {
+export interface VisibilityToggles {
   terrain: boolean;
   perimeter: boolean;
   neighbors: boolean;
@@ -16,7 +16,7 @@ interface VisibilityToggles {
   fence: boolean;
 }
 
-export type ViewKey = 'iso' | 'front' | 'top' | 'back';
+export type ViewKey = 'iso' | 'front' | 'side' | 'top' | 'back';
 
 interface AppState {
   scenario: ScenarioKey;

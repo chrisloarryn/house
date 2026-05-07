@@ -1,11 +1,11 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useMemo } from 'react';
 import { useThree } from '@react-three/fiber';
-import { OrbitControls, Environment, Sky } from '@react-three/drei';
+import { OrbitControls, Sky } from '@react-three/drei';
 import * as THREE from 'three';
 import { useStore } from '../../store/useStore';
 import { SCENARIOS } from '../../config/scenarios';
 import { PAL } from '../../config/palettes';
-import { L, cx, cz } from '../../config/constants';
+import { L } from '../../config/constants';
 
 import { Terrain } from './Terrain';
 import { Perimeter } from './Perimeter';
@@ -20,27 +20,41 @@ export function Scene() {
   const { scenario, toggles, view } = useStore();
   const activeScenario = SCENARIOS[scenario];
   const palette = PAL[activeScenario.paleta];
-  const controlsRef = useRef<any>(null);
+  const controlsRef = useRef<React.ElementRef<typeof OrbitControls>>(null);
   const { camera } = useThree();
 
-  const center = new THREE.Vector3(L.lote.frente / 2, 0, L.lote.fondoIzq / 2);
+  const center = useMemo(() => new THREE.Vector3(L.lote.frente / 2, 0, L.lote.fondoIzq / 2), []);
 
   useEffect(() => {
     if (!controlsRef.current) return;
     
-    // Simple camera transitions
-    let pos = [0,0,0];
+    let pos: [number, number, number] = [0, 0, 0];
+    const target = center.clone();
     switch(view) {
-      case 'front': pos = [center.x, 2, -10]; break;
-      case 'iso': pos = [15, 12, 20]; break;
-      case 'top': pos = [center.x, 25, center.z]; break;
-      case 'back': pos = [center.x, 2, 25]; break;
+      case 'front':
+        pos = [center.x, 3.1, -8.5];
+        target.set(center.x, 3.05, L.antejardinMin + 0.35);
+        break;
+      case 'side':
+        pos = [-3.5, 2.15, L.antejardinMin + 1.1];
+        target.set(L.lote.frente / 2, 3.7, L.antejardinMin + 2.8);
+        break;
+      case 'iso':
+        pos = [15, 12, 20];
+        break;
+      case 'top':
+        pos = [center.x, 25, center.z];
+        break;
+      case 'back':
+        pos = [center.x, 2.6, 25];
+        target.set(center.x, 2.3, L.antejardinMin + L.casa.fondo);
+        break;
     }
     
     camera.position.set(pos[0], pos[1], pos[2]);
-    controlsRef.current.target.copy(center);
+    controlsRef.current.target.copy(target);
     controlsRef.current.update();
-  }, [view]);
+  }, [camera.position, center, view]);
 
   return (
     <>
