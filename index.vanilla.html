@@ -19,6 +19,13 @@
   #ui .sect { margin-top: 10px; padding-top: 8px; border-top: 1px solid #444; font-size: 12px; }
   #ui button { background: #2a2a2a; color: #eee; border: 1px solid #444; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; }
   #ui button:hover { background: #3a3a3a; }
+  .wall-controls { display: grid; gap: 6px; margin: 6px 0 8px 20px; padding-left: 10px; border-left: 1px solid #444; }
+  .wall-row { display: grid; grid-template-columns: 52px 1fr 58px; gap: 6px; align-items: center; }
+  .wall-row span { color: #ccc; }
+  .wall-row select, .wall-row input {
+    min-width: 0; background: #1f1f1f; color: #eee; border: 1px solid #444;
+    border-radius: 4px; padding: 3px 5px; font: inherit;
+  }
   .tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; margin-bottom: 10px; }
   .tab { padding: 7px 8px; text-align: center; background: #1f1f1f; border: 1px solid #333; border-radius: 6px; cursor: pointer; font-size: 11.5px; line-height: 1.25; }
   .tab.active { background: #b86b3a; border-color: #d8895a; color: #fff; font-weight: 600; }
@@ -41,6 +48,32 @@
 
   <label><input type="checkbox" id="t-terrain" checked /> <span class="legend" style="background:#7a8a52"></span> Terreno (lote irregular)</label>
   <label><input type="checkbox" id="t-perimeter" checked /> <span class="legend" style="background:#a8a098"></span> Muros perimetrales (deslindes)</label>
+  <div class="wall-controls" aria-label="Opciones de muros perimetrales">
+    <div class="wall-row">
+      <span>Izq.</span>
+      <select id="wall-left-type">
+        <option value="pandereta">Pandereta</option>
+        <option value="ladrillo">Muro ladrillos</option>
+      </select>
+      <input id="wall-left-height" type="number" min="0.5" max="4" step="0.1" value="2.0" aria-label="Altura muro izquierdo en metros" />
+    </div>
+    <div class="wall-row">
+      <span>Der.</span>
+      <select id="wall-right-type">
+        <option value="pandereta">Pandereta</option>
+        <option value="ladrillo">Muro ladrillos</option>
+      </select>
+      <input id="wall-right-height" type="number" min="0.5" max="4" step="0.1" value="2.0" aria-label="Altura muro derecho en metros" />
+    </div>
+    <div class="wall-row">
+      <span>Fondo</span>
+      <select id="wall-back-type">
+        <option value="pandereta">Pandereta</option>
+        <option value="ladrillo">Muro ladrillos</option>
+      </select>
+      <input id="wall-back-height" type="number" min="0.5" max="4" step="0.1" value="2.0" aria-label="Altura muro trasero en metros" />
+    </div>
+  </div>
   <label><input type="checkbox" id="t-existing" checked /> <span class="legend" style="background:#c9b48a"></span> Casa existente</label>
   <label><input type="checkbox" id="t-roof" checked /> <span class="legend" style="background:#a04830"></span> Techo a dos aguas</label>
   <label><input type="checkbox" id="t-neighbors" checked /> <span class="legend" style="background:#a8a090"></span> Casas pareadas vecinas</label>
@@ -329,36 +362,97 @@ function buildTerrain() {
 }
 
 // ── Muros perimetrales (deslindes de hormigón visibles en las fotos) ───────
+function getWallConfig(side) {
+  const type = document.getElementById(`wall-${side}-type`)?.value || 'pandereta';
+  const rawHeight = Number(document.getElementById(`wall-${side}-height`)?.value);
+  const height = Number.isFinite(rawHeight) ? Math.min(4, Math.max(0.5, rawHeight)) : 2.0;
+  return { type, height };
+}
+
+function addWallTexture(group, { type, height, length, center, axis, sideSign = 1 }) {
+  if (type === 'ladrillo') {
+    const mortar = 0xd8c7b0;
+    for (let y = 0.28; y < height; y += 0.28) {
+      const line = axis === 'z'
+        ? box(0.018, 0.018, length - 0.12, mortar)
+        : box(length - 0.12, 0.018, 0.018, mortar);
+      line.position.set(center[0], y, center[2]);
+      if (axis === 'z') line.position.x += sideSign * 0.082;
+      else line.position.z += sideSign * 0.082;
+      group.add(line);
+    }
+    for (let d = 0.55; d < length - 0.2; d += 0.55) {
+      const joint = axis === 'z'
+        ? box(0.018, Math.max(0.12, height - 0.18), 0.018, mortar)
+        : box(0.018, Math.max(0.12, height - 0.18), 0.018, mortar);
+      const x = axis === 'z' ? center[0] + sideSign * 0.083 : center[0] - length / 2 + d;
+      const z = axis === 'z' ? center[2] - length / 2 + d : center[2] + sideSign * 0.083;
+      joint.position.set(x, height / 2, z);
+      group.add(joint);
+    }
+    return;
+  }
+
+  for (let y = 0.45; y < height; y += 0.45) {
+    const band = axis === 'z'
+      ? box(0.02, 0.025, length - 0.1, 0x807870)
+      : box(length - 0.1, 0.025, 0.02, 0x807870);
+    band.position.set(center[0], y, center[2]);
+    if (axis === 'z') band.position.x += sideSign * 0.082;
+    else band.position.z += sideSign * 0.082;
+    group.add(band);
+  }
+}
+
 function buildPerimeter() {
-  const altMuro = 2.0;
   const grosor = 0.15;
+  const left = getWallConfig('left');
+  const right = getWallConfig('right');
+  const back = getWallConfig('back');
+  const panderetaColor = 0xa8a098;
+  const ladrilloColor = 0xb96845;
   // Panderetas laterales continuas desde la reja hasta el fondo; al frente no hay muro transversal.
   const fondoR = L.lote.fondoDer;
   const fondoI = L.lote.fondoIzq;
 
   // Lateral derecho (dentro del lote)
-  const muroR = box(grosor, altMuro, fondoR, 0xa8a098);
-  muroR.position.set(L.lote.frente - grosor / 2, altMuro / 2, fondoR / 2);
+  const muroR = box(grosor, right.height, fondoR, right.type === 'ladrillo' ? ladrilloColor : panderetaColor);
+  muroR.position.set(L.lote.frente - grosor / 2, right.height / 2, fondoR / 2);
   groups.perimeter.add(muroR);
+  addWallTexture(groups.perimeter, {
+    type: right.type,
+    height: right.height,
+    length: fondoR,
+    center: [L.lote.frente - grosor / 2, right.height / 2, fondoR / 2],
+    axis: 'z',
+    sideSign: -1,
+  });
 
   // Lateral izquierdo (dentro del lote)
-  const muroL = box(grosor, altMuro, fondoI, 0xa8a098);
-  muroL.position.set(grosor / 2, altMuro / 2, fondoI / 2);
+  const muroL = box(grosor, left.height, fondoI, left.type === 'ladrillo' ? ladrilloColor : panderetaColor);
+  muroL.position.set(grosor / 2, left.height / 2, fondoI / 2);
   groups.perimeter.add(muroL);
+  addWallTexture(groups.perimeter, {
+    type: left.type,
+    height: left.height,
+    length: fondoI,
+    center: [grosor / 2, left.height / 2, fondoI / 2],
+    axis: 'z',
+    sideSign: 1,
+  });
 
   // Muro de fondo unido a ambas panderetas laterales.
-  const muroBack = box(L.lote.frente, altMuro, grosor, 0xa8a098);
-  muroBack.position.set(L.lote.frente / 2, altMuro / 2, L.lote.fondoIzq - grosor / 2);
+  const muroBack = box(L.lote.frente, back.height, grosor, back.type === 'ladrillo' ? ladrilloColor : panderetaColor);
+  muroBack.position.set(L.lote.frente / 2, back.height / 2, L.lote.fondoIzq - grosor / 2);
   groups.perimeter.add(muroBack);
-
-  // Bandas horizontales en muro derecho
-  for (let h of [0.45, 0.9, 1.35, 1.8]) {
-    const banda = box(fondoR - 0.1, 0.02, grosor + 0.01, 0x807870);
-    banda.position.set(L.lote.frente - grosor / 2, h, fondoR / 2);
-    banda.rotation.y = Math.PI / 2;
-    groups.perimeter.add(banda);
-  }
-
+  addWallTexture(groups.perimeter, {
+    type: back.type,
+    height: back.height,
+    length: L.lote.frente,
+    center: [L.lote.frente / 2, back.height / 2, L.lote.fondoIzq - grosor / 2],
+    axis: 'x',
+    sideSign: -1,
+  });
 }
 
 // ── Reja frontal metálica vertical (estado actual) ─────────────────────────
@@ -1138,22 +1232,21 @@ function buildLat(sc) {
   const colorLateral = isMed ? 0xd8c190 : 0xc8b898;
   const colorBand = isMed ? p.cuboBand : 0xeeeeee;
 
-  // Strip izquierdo: x=0 a x=cx (0.76 m), de cz a cz+casa.fondo
+  // Etiquetas invertidas respecto al eje interno: "izquierda" es la izquierda visual desde la calle.
   if (sc.ampLatL) {
     const a = sc.ampLatL;
-    const x0 = Math.max(0, cx - a.ancho);
-    const ancho = Math.min(a.ancho, cx - x0);
+    const x0 = cx + L.casa.ancho;
+    const ancho = Math.max(0, L.lote.frente - x0);
     groups.latL.add(place(box(ancho, a.alto, a.fondo, colorLateral), x0, 0, cz));
     // Cornisa
     const cor = box(ancho, 0.18, a.fondo, colorBand);
     cor.position.set(x0 + ancho / 2, a.alto + 0.09, cz + a.fondo / 2);
     groups.latL.add(cor);
   }
-  // Strip derecho: x=cx+casa.ancho a x=lote.frente, de cz a cz+casa.fondo
   if (sc.ampLatR) {
     const a = sc.ampLatR;
-    const x0 = cx + L.casa.ancho;
-    const ancho = Math.min(a.ancho, L.lote.frente - x0);
+    const x0 = 0;
+    const ancho = Math.max(0, cx);
     groups.latR.add(place(box(ancho, a.alto, a.fondo, colorLateral), x0, 0, cz));
     const cor = box(ancho, 0.18, a.fondo, colorBand);
     cor.position.set(x0 + ancho / 2, a.alto + 0.09, cz + a.fondo / 2);
