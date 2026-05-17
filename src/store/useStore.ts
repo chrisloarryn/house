@@ -31,19 +31,19 @@ interface AppState {
 }
 
 export const useStore = create<AppState>((set) => ({
-  scenario: 'actual',
-  view: 'iso',
+  scenario: 'ampliacion',
+  view: 'front',
   toggles: {
     terrain: true,
     perimeter: true,
     neighbors: true,
     existing: true,
     roof: true,
-    cube1: true,
-    cube2: true,
+    cube1: false,
+    cube2: false,
     back: true,
     latL: true,
-    latR: true,
+    latR: false,
     patio: true,
     pergola: true,
     fence: true,

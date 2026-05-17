@@ -1,6 +1,6 @@
 import type { PaletteKey } from './palettes';
 
-export type ScenarioKey = 'actual' | 'idea' | 'medA' | 'medB';
+export type ScenarioKey = 'actual' | 'ampliacion' | 'idea' | 'medA' | 'medB';
 
 export interface Ampliacion {
   ancho: number;
@@ -27,6 +27,17 @@ export const SCENARIOS: Record<ScenarioKey, Scenario> = {
     paleta: 'actual',
     cubo: null,
     ampLatL: null,
+    ampLatR: null,
+    ampBack: null,
+    cierraPatioInt: false,
+    pergola: false,
+    fence: true,
+  },
+  ampliacion: {
+    name: 'Ampliación',
+    paleta: 'actual',
+    cubo: null,
+    ampLatL: { ancho: 2.07, alto: 2.7, fondo: 9.73 },
     ampLatR: null,
     ampBack: null,
     cierraPatioInt: false,

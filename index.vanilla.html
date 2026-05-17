@@ -40,10 +40,8 @@
 <div id="ui">
   <h1>Casa Laurel — Masterplan</h1>
   <div class="tabs">
-    <div class="tab active" data-scenario="actual">Actual<span class="sub">sin ampliación</span></div>
-    <div class="tab" data-scenario="idea">Idea (ref.)<span class="sub">cubo gris · 1 piso</span></div>
-    <div class="tab" data-scenario="medA">Med. · DFL 2<span class="sub">≤140 m² · exenta</span></div>
-    <div class="tab" data-scenario="medB">Idea · Máximo<span class="sub">gris · 2 pisos</span></div>
+    <div class="tab" data-scenario="actual">Actual<span class="sub">sin ampliación</span></div>
+    <div class="tab active" data-scenario="ampliacion">Ampliación<span class="sub">lateral izq. · piso 1</span></div>
   </div>
 
   <label><input type="checkbox" id="t-terrain" checked /> <span class="legend" style="background:#7a8a52"></span> Terreno (lote irregular)</label>
@@ -77,11 +75,11 @@
   <label><input type="checkbox" id="t-existing" checked /> <span class="legend" style="background:#c9b48a"></span> Casa existente</label>
   <label><input type="checkbox" id="t-roof" checked /> <span class="legend" style="background:#a04830"></span> Techo a dos aguas</label>
   <label><input type="checkbox" id="t-neighbors" checked /> <span class="legend" style="background:#a8a090"></span> Casas pareadas vecinas</label>
-  <label><input type="checkbox" id="t-cube1" checked /> <span class="legend" style="background:#bfc4c8"></span> Cubo frontal piso 1</label>
-  <label><input type="checkbox" id="t-cube2" checked /> <span class="legend" style="background:#a8b0b6"></span> Cubo frontal piso 2 <span style="opacity:0.6;font-size:11px">(sólo Med. B)</span></label>
+  <label><input type="checkbox" id="t-cube1" /> <span class="legend" style="background:#bfc4c8"></span> Cubo frontal piso 1</label>
+  <label><input type="checkbox" id="t-cube2" /> <span class="legend" style="background:#a8b0b6"></span> Cubo frontal piso 2</label>
   <label><input type="checkbox" id="t-back" checked /> <span class="legend" style="background:#d8c8a8"></span> Ampliación trasera</label>
   <label><input type="checkbox" id="t-lat-l" checked /> <span class="legend" style="background:#c8b898"></span> Ampliación lateral izquierda (76 cm)</label>
-  <label><input type="checkbox" id="t-lat-r" checked /> <span class="legend" style="background:#c8b898"></span> Ampliación lateral derecha (76 cm)</label>
+  <label><input type="checkbox" id="t-lat-r" /> <span class="legend" style="background:#c8b898"></span> Ampliación lateral derecha (76 cm)</label>
   <label><input type="checkbox" id="t-patio" checked /> <span class="legend" style="background:#a8b890"></span> Cierre patio interior (L-shape)</label>
   <label><input type="checkbox" id="t-pergola" checked /> <span class="legend" style="background:#5a3820"></span> Pérgola madera</label>
   <label><input type="checkbox" id="t-fence" checked /> <span class="legend" style="background:#222"></span> Reja frontal (estado actual)</label>
@@ -182,39 +180,20 @@ const SCENARIOS = {
     cierraPatioInt: false,
     paleta: 'actual', fence: true, pergola: false,
   },
-  idea: {
-    nombre: 'Idea (referencia gris)',
-    descripcion: 'Cubo frontal 1 piso · siding gris',
-    cubo:    { ancho: 7.82, fondo: 3.0, alto: 2.7, pisos: 1 },
-    ampBack: { ancho: 7.82, fondo: 1.3, alto: 2.7 },
-    // Strips laterales: fondo = casa.fondo (9.73) → al ras del muro trasero de la casa
+  ampliacion: {
+    nombre: 'Ampliación',
+    descripcion: 'Casa original + ampliación lateral izquierda, primer piso, mirando desde el frente',
+    cubo: null,
+    ampBack: null,
     ampLatL: { ancho: 0.76, fondo: 9.73, alto: 2.7 },
-    ampLatR: { ancho: 0.76, fondo: 9.73, alto: 2.7 },
-    cierraPatioInt: true,
-    paleta: 'idea', fence: false, pergola: false,
-  },
-  medA: {
-    nombre: 'Mediterráneo · DFL 2',
-    descripcion: 'Tope 140 m² · contribuciones exentas',
-    cubo:    { ancho: 7.82, fondo: 3.0, alto: 2.9, pisos: 1 },
-    ampBack: { ancho: 7.82, fondo: 1.3, alto: 2.7 },
-    ampLatL: null, ampLatR: null,
-    cierraPatioInt: true,                                         // también rellena patio interior
-    paleta: 'med', fence: false, pergola: true,
-  },
-  medB: {
-    nombre: 'Idea gris · Máximo',
-    descripcion: 'Cubo gris moderno · 2 pisos completos',
-    cubo:    { ancho: 7.82, fondo: 3.0, alto: 2.9, pisos: 2 },
-    ampBack: { ancho: 7.82, fondo: 1.3, alto: 2.7 },
-    ampLatL: { ancho: 0.76, fondo: 9.73, alto: 2.7 },
-    ampLatR: { ancho: 0.76, fondo: 9.73, alto: 2.7 },
-    cierraPatioInt: true,                                         // rellena patio + vol piso 2 arriba
-    paleta: 'idea', fence: false, pergola: false,
+    ampLatR: null,
+    cierraPatioInt: false,
+    paleta: 'actual',
+    fence: true,
+    pergola: false,
   },
 };
 const M2_ACTUAL = 103.77;
-const TOPE_DFL2 = 140;
 
 // ── Setup Three.js ──────────────────────────────────────────────────────────
 const canvas = document.getElementById('app');
@@ -406,8 +385,8 @@ function addWallTexture(group, { type, height, length, center, axis, sideSign = 
 
 function buildPerimeter() {
   const grosor = 0.15;
-  const left = getWallConfig('left');
-  const right = getWallConfig('right');
+  const visualLeft = getWallConfig('left');
+  const visualRight = getWallConfig('right');
   const back = getWallConfig('back');
   const panderetaColor = 0xa8a098;
   const ladrilloColor = 0xb96845;
@@ -415,28 +394,27 @@ function buildPerimeter() {
   const fondoR = L.lote.fondoDer;
   const fondoI = L.lote.fondoIzq;
 
-  // Lateral derecho (dentro del lote)
-  const muroR = box(grosor, right.height, fondoR, right.type === 'ladrillo' ? ladrilloColor : panderetaColor);
-  muroR.position.set(L.lote.frente - grosor / 2, right.height / 2, fondoR / 2);
+  // "Izq." y "Der." siguen la lectura visual desde la calle.
+  const muroR = box(grosor, visualLeft.height, fondoR, visualLeft.type === 'ladrillo' ? ladrilloColor : panderetaColor);
+  muroR.position.set(L.lote.frente - grosor / 2, visualLeft.height / 2, fondoR / 2);
   groups.perimeter.add(muroR);
   addWallTexture(groups.perimeter, {
-    type: right.type,
-    height: right.height,
+    type: visualLeft.type,
+    height: visualLeft.height,
     length: fondoR,
-    center: [L.lote.frente - grosor / 2, right.height / 2, fondoR / 2],
+    center: [L.lote.frente - grosor / 2, visualLeft.height / 2, fondoR / 2],
     axis: 'z',
     sideSign: -1,
   });
 
-  // Lateral izquierdo (dentro del lote)
-  const muroL = box(grosor, left.height, fondoI, left.type === 'ladrillo' ? ladrilloColor : panderetaColor);
-  muroL.position.set(grosor / 2, left.height / 2, fondoI / 2);
+  const muroL = box(grosor, visualRight.height, fondoI, visualRight.type === 'ladrillo' ? ladrilloColor : panderetaColor);
+  muroL.position.set(grosor / 2, visualRight.height / 2, fondoI / 2);
   groups.perimeter.add(muroL);
   addWallTexture(groups.perimeter, {
-    type: left.type,
-    height: left.height,
+    type: visualRight.type,
+    height: visualRight.height,
     length: fondoI,
-    center: [grosor / 2, left.height / 2, fondoI / 2],
+    center: [grosor / 2, visualRight.height / 2, fondoI / 2],
     axis: 'z',
     sideSign: 1,
   });
@@ -1303,7 +1281,64 @@ function buildPatioInfill(sc) {
 }
 
 // ── Aplicar escenario ──────────────────────────────────────────────────────
-let currentScenario = 'actual';
+let currentScenario = 'ampliacion';
+
+function isChecked(id) {
+  return !!document.getElementById(id)?.checked;
+}
+
+function getAmplificationBlocks(sc) {
+  const blocks = [];
+
+  if (sc.cubo) {
+    const cuboFloorM2 = sc.cubo.ancho * sc.cubo.fondo;
+    blocks.push({ label: 'Cubo frontal P1', m2: cuboFloorM2, active: isChecked('t-cube1') });
+
+    if (sc.cubo.pisos === 2) {
+      blocks.push({ label: 'Cubo frontal P2', m2: cuboFloorM2, active: isChecked('t-cube2') });
+    }
+  }
+
+  if (sc.ampBack) {
+    blocks.push({ label: 'Ampliación trasera', m2: sc.ampBack.ancho * sc.ampBack.fondo, active: isChecked('t-back') });
+  }
+
+  if (sc.ampLatL) {
+    blocks.push({ label: 'Lateral izq. P1', m2: sc.ampLatL.ancho * sc.ampLatL.fondo, active: isChecked('t-lat-l') });
+  }
+
+  if (sc.ampLatR) {
+    blocks.push({ label: 'Lateral der. P1', m2: sc.ampLatR.ancho * sc.ampLatR.fondo, active: isChecked('t-lat-r') });
+  }
+
+  if (sc.cierraPatioInt) {
+    const huecoArea = L.casa.volDer.ancho * (L.casa.volIzq.fondo - L.casa.volDer.fondo);
+    const pisosPatio = (sc.cubo && sc.cubo.pisos === 2) ? 2 : 1;
+    blocks.push({ label: `Cierre patio interior${pisosPatio === 2 ? ' x2' : ''}`, m2: huecoArea * pisosPatio, active: isChecked('t-patio') });
+  }
+
+  return blocks;
+}
+
+function updateStats(sc) {
+  const blocks = getAmplificationBlocks(sc);
+  const selectedM2 = blocks.reduce((total, block) => total + (block.active ? block.m2 : 0), 0);
+  const hiddenM2 = blocks.reduce((total, block) => total + (!block.active ? block.m2 : 0), 0);
+  const totalM2 = M2_ACTUAL + selectedM2;
+  const blockRows = blocks.length
+    ? blocks.map(block => `${block.active ? '+' : 'oculto'} ${block.label}: ${block.m2.toFixed(1)} m²`).join('<br>')
+    : '—';
+
+  document.getElementById('stats').innerHTML = `
+    <b>${sc.nombre}</b><br>
+    <span style="opacity:0.7">${sc.descripcion}</span><br><br>
+    Actual original: ${M2_ACTUAL.toFixed(2)} m²<br>
+    <b>Ampliación seleccionada: +${selectedM2.toFixed(1)} m²</b><br>
+    ${hiddenM2 > 0 ? `Ampliación oculta: ${hiddenM2.toFixed(1)} m²<br>` : ''}
+    ${blockRows}<br>
+    <b>Total proyectado: ${totalM2.toFixed(1)} m²</b>
+  `;
+}
 
 function applyScenario(key) {
   currentScenario = key;
@@ -1330,31 +1365,6 @@ function applyScenario(key) {
   buildPergola(sc);
   if (sc.fence) buildFence();
 
-  const m2cubo = sc.cubo ? sc.cubo.ancho * sc.cubo.fondo * sc.cubo.pisos : 0;
-  const m2back = sc.ampBack ? sc.ampBack.ancho * sc.ampBack.fondo : 0;
-  const m2lat = (sc.ampLatL ? sc.ampLatL.ancho * sc.ampLatL.fondo : 0)
-              + (sc.ampLatR ? sc.ampLatR.ancho * sc.ampLatR.fondo : 0);
-  const huecoArea = L.casa.volDer.ancho * (L.casa.volIzq.fondo - L.casa.volDer.fondo);
-  const pisosPatio = (sc.cubo && sc.cubo.pisos === 2) ? 2 : 1;
-  const m2patio = sc.cierraPatioInt ? huecoArea * pisosPatio : 0;
-  const m2nuevo = m2cubo + m2back + m2lat + m2patio;
-  const m2total = M2_ACTUAL + m2nuevo;
-  const okDfl = m2total <= TOPE_DFL2;
-  const contribAnual = okDfl ? 0 : Math.max(0, (85 - 47)) * 1e6 * 0.00933;
-
-  document.getElementById('stats').innerHTML = `
-    <b>${sc.nombre}</b><br>
-    <span style="opacity:0.7">${sc.descripcion}</span><br><br>
-    Actual: ${M2_ACTUAL.toFixed(2)} m²<br>
-    Cubo frontal${sc.cubo ? ' (×' + sc.cubo.pisos + ')' : ''}: ${m2cubo > 0 ? '+' + m2cubo.toFixed(1) + ' m²' : '—'}<br>
-    Ampl. trasera: ${m2back > 0 ? '+' + m2back.toFixed(1) + ' m²' : '—'}<br>
-    Ampl. laterales: ${m2lat > 0 ? '+' + m2lat.toFixed(1) + ' m²' : '—'}<br>
-    Cierre patio interior${pisosPatio === 2 ? ' (×2)' : ''}: ${m2patio > 0 ? '+' + m2patio.toFixed(1) + ' m²' : '—'}<br>
-    <b>Total: ${m2total.toFixed(1)} m²</b>
-    <span class="${okDfl ? 'ok' : 'ko'}">${okDfl ? '✓ DFL 2 OK' : '✗ pierde DFL 2'}</span><br>
-    Contribuciones est.: ${okDfl ? '$0 (exento)' : '~$' + Math.round(contribAnual / 1000) + ' k/año'}
-  `;
-
   // Visibilidad coherente con checkboxes y disponibilidad
   groups.cube1.visible = document.getElementById('t-cube1').checked && !!sc.cubo;
   groups.cube2.visible = document.getElementById('t-cube2').checked && !!sc.cubo && sc.cubo.pisos === 2;
@@ -1364,6 +1374,7 @@ function applyScenario(key) {
   groups.patio.visible = document.getElementById('t-patio').checked && sc.cierraPatioInt;
   groups.pergola.visible = document.getElementById('t-pergola').checked && sc.pergola;
   groups.fence.visible = document.getElementById('t-fence').checked && sc.fence;
+  updateStats(sc);
 }
 
 // ── Toggles ─────────────────────────────────────────────────────────────────
@@ -1386,6 +1397,7 @@ Object.entries(toggleMap).forEach(([id, g]) => {
     else if (id === 't-pergola') g.visible = e.target.checked && sc.pergola;
     else if (id === 't-fence') g.visible = e.target.checked && sc.fence;
     else g.visible = e.target.checked;
+    updateStats(sc);
   });
 });
 
@@ -1419,8 +1431,8 @@ function setView(pos) {
 }
 const views = {
   front: [L.lote.frente / 2, 3.5, -12],
-  left:  [-8, 4.4, cz + L.casa.fondo / 2],
-  right: [L.lote.frente + 8, 4.4, cz + L.casa.fondo / 2],
+  left:  [L.lote.frente + 8, 4.4, cz + L.casa.fondo / 2],
+  right: [-8, 4.4, cz + L.casa.fondo / 2],
   iso:   [L.lote.frente + 14, 11, -7],
   top:   [L.lote.frente / 2, 32, 8.01],
   back:  [L.lote.frente / 2, 5, L.lote.fondoIzq + 8],
@@ -1433,8 +1445,8 @@ document.querySelectorAll('[data-view]').forEach(b => {
 buildTerrain();
 buildPerimeter();
 buildNeighbors();
-applyScenario('actual');
-setView(views.iso);
+applyScenario('ampliacion');
+setView(views.front);
 
 function resize() {
   const w = window.innerWidth, h = window.innerHeight;

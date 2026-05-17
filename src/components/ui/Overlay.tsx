@@ -11,11 +11,12 @@ import {
 import { useStore } from '../../store/useStore';
 import { SCENARIOS } from '../../config/scenarios';
 import {
+  L,
   M2_ACTUAL,
   M2_PRIMER_PISO,
   M2_SEGUNDO_PISO,
   PLAN_FACTS,
-  TOPE_DFL2,
+  cx,
 } from '../../config/constants';
 import type { ScenarioKey } from '../../config/scenarios';
 import type { ViewKey, VisibilityToggles } from '../../store/useStore';
@@ -23,7 +24,7 @@ import type { ViewKey, VisibilityToggles } from '../../store/useStore';
 const plantaP1 = new URL('../../../images/espacios/plano_secciones/01_planta_piso1.png', import.meta.url).href;
 const plantaP2 = new URL('../../../images/espacios/plano_secciones/02_planta_piso2.png', import.meta.url).href;
 
-const SCENARIO_TABS: ScenarioKey[] = ['actual', 'medA', 'medB'];
+const SCENARIO_TABS: ScenarioKey[] = ['actual', 'ampliacion'];
 
 const FLOOR_PROGRAM = [
   {
@@ -46,6 +47,9 @@ const VIEW_OPTIONS: Array<{ key: ViewKey; label: string }> = [
   { key: 'back', label: 'Patio' },
 ];
 
+const lateralIzqVisualAncho = L.lote.frente - (cx + L.casa.ancho);
+const lateralDerVisualAncho = cx;
+
 function getConstructionBlocks(scenarioKey: ScenarioKey, toggles: VisibilityToggles) {
   const activeScenario = SCENARIOS[scenarioKey];
   const blocks = [];
@@ -62,7 +66,7 @@ function getConstructionBlocks(scenarioKey: ScenarioKey, toggles: VisibilityTogg
   if (activeScenario.ampLatL) {
     blocks.push({
       label: 'Ampliación lateral izq.',
-      m2: activeScenario.ampLatL.ancho * activeScenario.ampLatL.fondo,
+      m2: lateralIzqVisualAncho * activeScenario.ampLatL.fondo,
       active: toggles.latL,
     });
   }
@@ -70,7 +74,7 @@ function getConstructionBlocks(scenarioKey: ScenarioKey, toggles: VisibilityTogg
   if (activeScenario.ampLatR) {
     blocks.push({
       label: 'Ampliación lateral der.',
-      m2: activeScenario.ampLatR.ancho * activeScenario.ampLatR.fondo,
+      m2: lateralDerVisualAncho * activeScenario.ampLatR.fondo,
       active: toggles.latR,
     });
   }
@@ -93,9 +97,6 @@ export function Overlay() {
   const additionalM2 = constructionBlocks.reduce((total, block) => total + (block.active ? block.m2 : 0), 0);
   const inactiveM2 = constructionBlocks.reduce((total, block) => total + (!block.active ? block.m2 : 0), 0);
   const totalM2 = M2_ACTUAL + additionalM2;
-  const dflRemaining = TOPE_DFL2 - totalM2;
-  const dflProgress = Math.min(100, (totalM2 / TOPE_DFL2) * 100);
-  const dflStatus = dflRemaining >= 0 ? `${dflRemaining.toFixed(1)} m² libres` : `${Math.abs(dflRemaining).toFixed(1)} m² sobre`;
   const priceNumber = Number(pricePerM2.replace(/[^0-9.]/g, ''));
   const totalPrice = Number.isFinite(priceNumber) && priceNumber > 0 ? additionalM2 * priceNumber : 0;
   const allVisible = Object.values(toggles).every(Boolean);
@@ -169,13 +170,10 @@ export function Overlay() {
 
           <div className="dfl-card">
             <div>
-              <span className="panel-label">Superficie proyectada</span>
-              <strong>{totalM2.toFixed(1)} m²</strong>
+              <span className="panel-label">Ampliación seleccionada</span>
+              <strong>+{additionalM2.toFixed(1)} m²</strong>
             </div>
-            <div className={`dfl-badge ${dflRemaining >= 0 ? 'ok' : 'over'}`}>{dflStatus}</div>
-            <div className="meter" aria-label={`Avance DFL2 ${dflProgress.toFixed(0)}%`}>
-              <span style={{ width: `${dflProgress}%` }} />
-            </div>
+            <div className="dfl-badge ok">Total {totalM2.toFixed(1)} m²</div>
             {inactiveM2 > 0 && <small>{inactiveM2.toFixed(1)} m² ocultos por capas apagadas.</small>}
           </div>
         </aside>
