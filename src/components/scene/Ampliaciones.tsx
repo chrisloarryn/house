@@ -16,6 +16,7 @@ function Box({ position, args, color }: { position: [number, number, number], ar
 export function Ampliaciones({ scenario, palette, toggles }: { scenario: Scenario, palette: Palette, toggles: VisibilityToggles }) {
   const isMed = scenario.paleta === 'med';
   const colorBase = isMed ? palette.estuco1 : palette.cubo;
+  const colorLateral = isMed ? 0xd8c190 : 0xc8b898;
   const colorBand = isMed ? palette.cuboBand : 0xeeeeee;
   const rearStartZ = cz + L.casa.fondo;
   const rearCenterX = cx + L.casa.ancho / 2;
@@ -60,7 +61,7 @@ export function Ampliaciones({ scenario, palette, toggles }: { scenario: Scenari
           <Box 
             position={[latLeftX + scenario.ampLatL.ancho / 2, scenario.ampLatL.alto / 2, cz + scenario.ampLatL.fondo / 2]} 
             args={[scenario.ampLatL.ancho, scenario.ampLatL.alto, scenario.ampLatL.fondo]} 
-            color={colorBase} 
+            color={colorLateral} 
           />
           <Box 
             position={[latLeftX + scenario.ampLatL.ancho / 2, scenario.ampLatL.alto + 0.09, cz + scenario.ampLatL.fondo / 2]} 
@@ -75,7 +76,7 @@ export function Ampliaciones({ scenario, palette, toggles }: { scenario: Scenari
           <Box 
             position={[latRightX + scenario.ampLatR.ancho / 2, scenario.ampLatR.alto / 2, cz + scenario.ampLatR.fondo / 2]} 
             args={[scenario.ampLatR.ancho, scenario.ampLatR.alto, scenario.ampLatR.fondo]} 
-            color={colorBase} 
+            color={colorLateral} 
           />
           <Box 
             position={[latRightX + scenario.ampLatR.ancho / 2, scenario.ampLatR.alto + 0.09, cz + scenario.ampLatR.fondo / 2]} 
