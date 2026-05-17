@@ -1,6 +1,7 @@
 import React from 'react';
 import {
   Calculator,
+  ChevronDown,
   Eye,
   EyeOff,
   FileText,
@@ -93,6 +94,9 @@ function getConstructionBlocks(scenarioKey: ScenarioKey, toggles: VisibilityTogg
 export function Overlay() {
   const { scenario, setScenario, view, setView, toggles, toggleVisibility, setAllToggles } = useStore();
   const [pricePerM2, setPricePerM2] = React.useState('');
+  const [layersOpen, setLayersOpen] = React.useState(() => (
+    typeof window === 'undefined' ? true : !window.matchMedia('(max-width: 720px)').matches
+  ));
   const constructionBlocks = getConstructionBlocks(scenario, toggles);
   const additionalM2 = constructionBlocks.reduce((total, block) => total + (block.active ? block.m2 : 0), 0);
   const inactiveM2 = constructionBlocks.reduce((total, block) => total + (!block.active ? block.m2 : 0), 0);
@@ -230,35 +234,46 @@ export function Overlay() {
       </aside>
 
       <footer className="bottom-area">
-        <section className="controls-panel">
-          <div className="controls-header">
+        <section className={`controls-panel collapsible-panel ${layersOpen ? 'open' : ''}`}>
+          <button
+            className="controls-header collapsible-trigger"
+            type="button"
+            aria-expanded={layersOpen}
+            onClick={() => setLayersOpen((isOpen) => !isOpen)}
+          >
             <span>
               <Layers3 size={15} aria-hidden />
               Capas 3D
             </span>
-            <button
-              className="toggle-all-btn"
-              onClick={() => {
-                setAllToggles(!allVisible);
-              }}
-            >
-              {allVisible ? <EyeOff size={14} aria-hidden /> : <Eye size={14} aria-hidden />}
-              {allVisible ? 'Ocultar' : 'Mostrar'}
-            </button>
-          </div>
+            <ChevronDown size={16} aria-hidden className="collapse-chevron" />
+          </button>
 
-          <div className="toggle-grid">
-            {toggleConfig.map(({ key, label }) => (
-              <label key={key} className={`toggle-row ${toggles[key] ? 'checked' : ''}`}>
-                <input
-                  type="checkbox"
-                  checked={toggles[key]}
-                  onChange={() => toggleVisibility(key)}
-                />
-                <span aria-hidden />
-                {label}
-              </label>
-            ))}
+          <div className="collapsible-content" hidden={!layersOpen}>
+            <div className="layer-actions">
+              <button
+                className="toggle-all-btn"
+                onClick={() => {
+                  setAllToggles(!allVisible);
+                }}
+              >
+                {allVisible ? <EyeOff size={14} aria-hidden /> : <Eye size={14} aria-hidden />}
+                {allVisible ? 'Ocultar' : 'Mostrar'}
+              </button>
+            </div>
+
+            <div className="toggle-grid">
+              {toggleConfig.map(({ key, label }) => (
+                <label key={key} className={`toggle-row ${toggles[key] ? 'checked' : ''}`}>
+                  <input
+                    type="checkbox"
+                    checked={toggles[key]}
+                    onChange={() => toggleVisibility(key)}
+                  />
+                  <span aria-hidden />
+                  {label}
+                </label>
+              ))}
+            </div>
           </div>
         </section>
 

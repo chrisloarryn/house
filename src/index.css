@@ -420,9 +420,38 @@ button {
 
 .controls-header {
   display: flex;
+  width: 100%;
   justify-content: space-between;
   gap: 10px;
   align-items: center;
+  margin-bottom: 10px;
+}
+
+.collapsible-trigger {
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  padding: 0;
+  text-align: left;
+}
+
+.collapse-chevron {
+  color: var(--olive);
+  transition: transform 180ms ease;
+}
+
+.collapsible-panel.open .collapse-chevron {
+  transform: rotate(180deg);
+}
+
+.collapsible-content[hidden] {
+  display: none;
+}
+
+.layer-actions {
+  display: flex;
+  justify-content: flex-end;
   margin-bottom: 10px;
 }
 
@@ -676,6 +705,19 @@ button {
 
   .controls-header {
     margin-bottom: 8px;
+  }
+
+  .collapsible-panel:not(.open) .controls-header {
+    margin-bottom: 0;
+  }
+
+  .layer-actions {
+    justify-content: stretch;
+  }
+
+  .layer-actions .toggle-all-btn {
+    width: 100%;
+    justify-content: center;
   }
 
   .toggle-grid {
