@@ -23,7 +23,7 @@ export interface Scenario {
 
 export const SCENARIOS: Record<ScenarioKey, Scenario> = {
   actual: {
-    name: 'Estado Actual',
+    name: 'Plano oficial',
     paleta: 'actual',
     cubo: null,
     ampLatL: null,
@@ -34,7 +34,7 @@ export const SCENARIOS: Record<ScenarioKey, Scenario> = {
     fence: true,
   },
   idea: {
-    name: 'Idea Ref',
+    name: 'Referencia gris',
     paleta: 'idea',
     cubo: { ancho: 7.82, alto: 2.7, fondo: 3.6, pisos: 1 }, // solo primer piso visible por defecto
     ampLatL: { ancho: 0.76, alto: 2.7, fondo: 9.73 },
@@ -45,25 +45,24 @@ export const SCENARIOS: Record<ScenarioKey, Scenario> = {
     fence: true,
    },
    medA: {
-     name: 'Mediterráneo · DFL 2',
+     name: 'DFL2 conservado',
      paleta: 'med',
-     // Configuración idéntica a Idea Ref pero con paleta mediterránea
      cubo: { ancho: 7.82, alto: 2.7, fondo: 3.6, pisos: 1 },
-     ampLatL: { ancho: 0.76, alto: 2.7, fondo: 9.73 },
-     ampLatR: { ancho: 0.76, alto: 2.7, fondo: 9.73 },
-     ampBack: { ancho: 6.30, alto: 2.7, fondo: 3.5 },
-     cierraPatioInt: true,
+     ampLatL: null,
+     ampLatR: null,
+     ampBack: { ancho: 6.30, alto: 2.7, fondo: 1.3 },
+     cierraPatioInt: false,
      pergola: false,
      fence: true,
    },
    medB: {
-    name: 'Mediterráneo · 2 Pisos',
+    name: 'Ampliación máxima',
     paleta: 'med',
     cubo: { ancho: 7.82, alto: 2.7, fondo: 3.6, pisos: 2 },
-    ampLatL: { ancho: 0.76, alto: 2.7, fondo: 9.73 },
-    ampLatR: { ancho: 0.76, alto: 2.7, fondo: 9.73 },
+    ampLatL: null,
+    ampLatR: null,
     ampBack: { ancho: 6.30, alto: 2.7, fondo: 3.5 },
-    cierraPatioInt: true,
+    cierraPatioInt: false,
     pergola: false,
     fence: true,
   }

@@ -1,7 +1,6 @@
 import React from 'react';
 import { ExistingHouse } from './ExistingHouse';
 import { Roof } from './Roof';
-import { Perimeter } from './Perimeter';
 import { Fence } from './Fence';
 import { L } from '../../config/constants';
 import type { Palette } from '../../config/palettes';

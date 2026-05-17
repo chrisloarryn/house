@@ -83,8 +83,8 @@ function ChamferFace({ x, width, chamfer, y, height, color, zOffset = 0 }: {
 }
 
 export function Cubo({ level, data, palette, isMed }: { level: number, data: Ampliacion, palette: Palette, isMed: boolean }) {
-  const cuboX = 0.15; // respetando el muro izquierdo
-  const cuboW = L.lote.frente - cuboX * 2;
+  const cuboW = data.ancho;
+  const cuboX = (L.lote.frente - cuboW) / 2;
   const f = data.fondo; // 3.6
   const h = data.alto; // 2.7
   const chamfer = 1.15;

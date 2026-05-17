@@ -71,7 +71,18 @@ export function Scene() {
       />
       <directionalLight position={[-20, 20, -20]} intensity={0.5} />
 
-      <OrbitControls ref={controlsRef} makeDefault />
+      <OrbitControls
+        ref={controlsRef}
+        makeDefault
+        enableDamping
+        dampingFactor={0.08}
+        minDistance={3}
+        maxDistance={55}
+        touches={{
+          ONE: THREE.TOUCH.ROTATE,
+          TWO: THREE.TOUCH.DOLLY_PAN,
+        }}
+      />
 
       <group position={[0, 0, 0]}>
         {toggles.terrain && <Terrain />}

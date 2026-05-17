@@ -47,7 +47,8 @@
   <label><input type="checkbox" id="t-cube1" checked /> <span class="legend" style="background:#bfc4c8"></span> Cubo frontal piso 1</label>
   <label><input type="checkbox" id="t-cube2" checked /> <span class="legend" style="background:#a8b0b6"></span> Cubo frontal piso 2 <span style="opacity:0.6;font-size:11px">(sólo Med. B)</span></label>
   <label><input type="checkbox" id="t-back" checked /> <span class="legend" style="background:#d8c8a8"></span> Ampliación trasera</label>
-  <label><input type="checkbox" id="t-lat" checked /> <span class="legend" style="background:#c8b898"></span> Ampliaciones laterales (76 cm)</label>
+  <label><input type="checkbox" id="t-lat-l" checked /> <span class="legend" style="background:#c8b898"></span> Ampliación lateral izquierda (76 cm)</label>
+  <label><input type="checkbox" id="t-lat-r" checked /> <span class="legend" style="background:#c8b898"></span> Ampliación lateral derecha (76 cm)</label>
   <label><input type="checkbox" id="t-patio" checked /> <span class="legend" style="background:#a8b890"></span> Cierre patio interior (L-shape)</label>
   <label><input type="checkbox" id="t-pergola" checked /> <span class="legend" style="background:#5a3820"></span> Pérgola madera</label>
   <label><input type="checkbox" id="t-fence" checked /> <span class="legend" style="background:#222"></span> Reja frontal (estado actual)</label>
@@ -252,7 +253,8 @@ const groups = {
   cube1: new THREE.Group(),
   cube2: new THREE.Group(),
   back: new THREE.Group(),
-  lat: new THREE.Group(),
+  latL: new THREE.Group(),
+  latR: new THREE.Group(),
   patio: new THREE.Group(),                                      // relleno patio interior L-shape
   pergola: new THREE.Group(),
   fence: new THREE.Group(),
@@ -1141,21 +1143,21 @@ function buildLat(sc) {
   if (sc.ampLatL) {
     const a = sc.ampLatL;
     const ancho = Math.max(0, cx - xInteriorIzq);
-    groups.lat.add(place(box(ancho, a.alto, a.fondo, colorBase), xInteriorIzq, 0, cz));
+    groups.latL.add(place(box(ancho, a.alto, a.fondo, colorBase), xInteriorIzq, 0, cz));
     // Cornisa
     const cor = box(ancho, 0.18, a.fondo, colorBand);
     cor.position.set(xInteriorIzq + ancho / 2, a.alto + 0.09, cz + a.fondo / 2);
-    groups.lat.add(cor);
+    groups.latL.add(cor);
   }
   // Strip derecho: x=cx+casa.ancho a x=lote.frente, de cz a cz+casa.fondo
   if (sc.ampLatR) {
     const a = sc.ampLatR;
     const x0 = cx + L.casa.ancho;
     const ancho = Math.max(0, xInteriorDer - x0);
-    groups.lat.add(place(box(ancho, a.alto, a.fondo, colorBase), x0, 0, cz));
+    groups.latR.add(place(box(ancho, a.alto, a.fondo, colorBase), x0, 0, cz));
     const cor = box(ancho, 0.18, a.fondo, colorBand);
     cor.position.set(x0 + ancho / 2, a.alto + 0.09, cz + a.fondo / 2);
-    groups.lat.add(cor);
+    groups.latR.add(cor);
   }
 }
 
@@ -1220,7 +1222,8 @@ function applyScenario(key) {
   clearGroup(groups.cube1);
   clearGroup(groups.cube2);
   clearGroup(groups.back);
-  clearGroup(groups.lat);
+  clearGroup(groups.latL);
+  clearGroup(groups.latR);
   clearGroup(groups.patio);
   clearGroup(groups.pergola);
   clearGroup(groups.fence);
@@ -1263,7 +1266,8 @@ function applyScenario(key) {
   groups.cube1.visible = document.getElementById('t-cube1').checked && !!sc.cubo;
   groups.cube2.visible = document.getElementById('t-cube2').checked && !!sc.cubo && sc.cubo.pisos === 2;
   groups.back.visible = document.getElementById('t-back').checked && !!sc.ampBack;
-  groups.lat.visible = document.getElementById('t-lat').checked && (!!sc.ampLatL || !!sc.ampLatR);
+  groups.latL.visible = document.getElementById('t-lat-l').checked && !!sc.ampLatL;
+  groups.latR.visible = document.getElementById('t-lat-r').checked && !!sc.ampLatR;
   groups.patio.visible = document.getElementById('t-patio').checked && sc.cierraPatioInt;
   groups.pergola.visible = document.getElementById('t-pergola').checked && sc.pergola;
   groups.fence.visible = document.getElementById('t-fence').checked && sc.fence;
@@ -1274,7 +1278,7 @@ const toggleMap = {
   't-terrain': groups.terrain, 't-perimeter': groups.perimeter,
   't-existing': groups.existing, 't-roof': groups.roof,
   't-neighbors': groups.neighbors, 't-cube1': groups.cube1, 't-cube2': groups.cube2,
-  't-back': groups.back, 't-lat': groups.lat, 't-patio': groups.patio,
+  't-back': groups.back, 't-lat-l': groups.latL, 't-lat-r': groups.latR, 't-patio': groups.patio,
   't-pergola': groups.pergola, 't-fence': groups.fence,
 };
 Object.entries(toggleMap).forEach(([id, g]) => {
@@ -1283,7 +1287,8 @@ Object.entries(toggleMap).forEach(([id, g]) => {
     if (id === 't-cube1') g.visible = e.target.checked && !!sc.cubo;
     else if (id === 't-cube2') g.visible = e.target.checked && !!sc.cubo && sc.cubo.pisos === 2;
     else if (id === 't-back') g.visible = e.target.checked && !!sc.ampBack;
-    else if (id === 't-lat') g.visible = e.target.checked && (!!sc.ampLatL || !!sc.ampLatR);
+    else if (id === 't-lat-l') g.visible = e.target.checked && !!sc.ampLatL;
+    else if (id === 't-lat-r') g.visible = e.target.checked && !!sc.ampLatR;
     else if (id === 't-patio') g.visible = e.target.checked && sc.cierraPatioInt;
     else if (id === 't-pergola') g.visible = e.target.checked && sc.pergola;
     else if (id === 't-fence') g.visible = e.target.checked && sc.fence;

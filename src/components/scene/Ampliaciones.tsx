@@ -17,7 +17,8 @@ export function Ampliaciones({ scenario, palette, toggles }: { scenario: Scenari
   const isMed = scenario.paleta === 'med';
   const colorBase = isMed ? palette.estuco1 : palette.cubo;
   const colorBand = isMed ? palette.cuboBand : 0xeeeeee;
-  const rearDepth = L.lote.fondoIzq - (cz + L.casa.fondo);
+  const rearStartZ = cz + L.casa.fondo;
+  const rearCenterX = cx + L.casa.ancho / 2;
   
   return (
     <group>
@@ -25,63 +26,60 @@ export function Ampliaciones({ scenario, palette, toggles }: { scenario: Scenari
       {toggles.back && scenario.ampBack && (
         <group>
           <Box 
-            position={[L.lote.frente / 2, scenario.ampBack.alto / 2, cz + L.casa.fondo + rearDepth / 2]} 
-            args={[L.lote.frente, scenario.ampBack.alto, rearDepth]} 
+            position={[rearCenterX, scenario.ampBack.alto / 2, rearStartZ + scenario.ampBack.fondo / 2]} 
+            args={[scenario.ampBack.ancho, scenario.ampBack.alto, scenario.ampBack.fondo]} 
             color={colorBase} 
           />
           {/* Cornisa trasera */}
           <Box 
-            position={[L.lote.frente / 2, scenario.ampBack.alto + 0.09, cz + L.casa.fondo + rearDepth / 2]} 
-            args={[L.lote.frente, 0.18, rearDepth + 0.05]} 
+            position={[rearCenterX, scenario.ampBack.alto + 0.09, rearStartZ + scenario.ampBack.fondo / 2]} 
+            args={[scenario.ampBack.ancho, 0.18, scenario.ampBack.fondo + 0.05]} 
             color={colorBand} 
           />
           {/* Tejadillo si es mediterraneo */}
           {isMed && (
-            <mesh position={[L.lote.frente / 2, scenario.ampBack.alto + 0.37, cz + L.casa.fondo + rearDepth / 2]} rotation={[-0.06, 0, 0]}>
-              <boxGeometry args={[L.lote.frente + 0.3, 0.1, rearDepth + 0.3]} />
+            <mesh position={[rearCenterX, scenario.ampBack.alto + 0.37, rearStartZ + scenario.ampBack.fondo / 2]} rotation={[-0.06, 0, 0]}>
+              <boxGeometry args={[scenario.ampBack.ancho + 0.3, 0.1, scenario.ampBack.fondo + 0.3]} />
               <meshStandardMaterial color={palette.teja} roughness={0.9} />
             </mesh>
           )}
           {/* Ventanal */}
           <Box 
-            position={[L.lote.frente / 2, (scenario.ampBack.alto - 0.7) / 2 + 0.3, cz + L.casa.fondo + rearDepth + 0.01]} 
-            args={[L.lote.frente - 1.4, scenario.ampBack.alto - 0.7, 0.04]} 
+            position={[rearCenterX, (scenario.ampBack.alto - 0.7) / 2 + 0.3, rearStartZ + scenario.ampBack.fondo + 0.01]} 
+            args={[scenario.ampBack.ancho - 1.0, scenario.ampBack.alto - 0.7, 0.04]} 
             color={palette.marco || 0x222} 
           />
         </group>
       )}
 
       {/* Ampliaciones Laterales */}
-      {toggles.lat && (
+      {toggles.latL && scenario.ampLatL && (
         <group>
-          {scenario.ampLatL && (
-            <group>
-              <Box 
-                position={[0.15 + (cx - 0.15) / 2, scenario.ampLatL.alto / 2, cz + scenario.ampLatL.fondo / 2]} 
-                args={[cx - 0.15, scenario.ampLatL.alto, scenario.ampLatL.fondo]} 
-                color={colorBase} 
-              />
-              <Box 
-                position={[0.15 + (cx - 0.15) / 2, scenario.ampLatL.alto + 0.09, cz + scenario.ampLatL.fondo / 2]} 
-                args={[cx - 0.15, 0.18, scenario.ampLatL.fondo]} 
-                color={colorBand} 
-              />
-            </group>
-          )}
-          {scenario.ampLatR && (
-            <group>
-              <Box 
-                position={[cx + L.casa.ancho + (L.lote.frente - 0.15 - (cx + L.casa.ancho)) / 2, scenario.ampLatR.alto / 2, cz + scenario.ampLatR.fondo / 2]} 
-                args={[L.lote.frente - 0.15 - (cx + L.casa.ancho), scenario.ampLatR.alto, scenario.ampLatR.fondo]} 
-                color={colorBase} 
-              />
-              <Box 
-                position={[cx + L.casa.ancho + (L.lote.frente - 0.15 - (cx + L.casa.ancho)) / 2, scenario.ampLatR.alto + 0.09, cz + scenario.ampLatR.fondo / 2]} 
-                args={[L.lote.frente - 0.15 - (cx + L.casa.ancho), 0.18, scenario.ampLatR.fondo]} 
-                color={colorBand} 
-              />
-            </group>
-          )}
+          <Box 
+            position={[0.15 + (cx - 0.15) / 2, scenario.ampLatL.alto / 2, cz + scenario.ampLatL.fondo / 2]} 
+            args={[cx - 0.15, scenario.ampLatL.alto, scenario.ampLatL.fondo]} 
+            color={colorBase} 
+          />
+          <Box 
+            position={[0.15 + (cx - 0.15) / 2, scenario.ampLatL.alto + 0.09, cz + scenario.ampLatL.fondo / 2]} 
+            args={[cx - 0.15, 0.18, scenario.ampLatL.fondo]} 
+            color={colorBand} 
+          />
+        </group>
+      )}
+
+      {toggles.latR && scenario.ampLatR && (
+        <group>
+          <Box 
+            position={[cx + L.casa.ancho + (L.lote.frente - 0.15 - (cx + L.casa.ancho)) / 2, scenario.ampLatR.alto / 2, cz + scenario.ampLatR.fondo / 2]} 
+            args={[L.lote.frente - 0.15 - (cx + L.casa.ancho), scenario.ampLatR.alto, scenario.ampLatR.fondo]} 
+            color={colorBase} 
+          />
+          <Box 
+            position={[cx + L.casa.ancho + (L.lote.frente - 0.15 - (cx + L.casa.ancho)) / 2, scenario.ampLatR.alto + 0.09, cz + scenario.ampLatR.fondo / 2]} 
+            args={[L.lote.frente - 0.15 - (cx + L.casa.ancho), 0.18, scenario.ampLatR.fondo]} 
+            color={colorBand} 
+          />
         </group>
       )}
 

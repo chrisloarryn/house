@@ -10,7 +10,8 @@ export interface VisibilityToggles {
   cube1: boolean;
   cube2: boolean;
   back: boolean;
-  lat: boolean;
+  latL: boolean;
+  latR: boolean;
   patio: boolean;
   pergola: boolean;
   fence: boolean;
@@ -41,7 +42,8 @@ export const useStore = create<AppState>((set) => ({
     cube1: true,
     cube2: false,
     back: true,
-    lat: true,
+    latL: true,
+    latR: true,
     patio: true,
     pergola: true,
     fence: true,

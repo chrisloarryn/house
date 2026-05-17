@@ -7,7 +7,7 @@ function App() {
   return (
     <div className="app-container">
       <Overlay />
-      <Canvas shadows camera={{ position: [15, 12, 20], fov: 40 }}>
+      <Canvas className="scene-canvas" shadows camera={{ position: [15, 12, 20], fov: 40 }}>
         <Scene />
       </Canvas>
     </div>

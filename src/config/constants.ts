@@ -19,3 +19,16 @@ export const cz = L.antejardinMin; // 3.0
 
 export const TOPE_DFL2 = 140.0;
 export const M2_ACTUAL = 103.77;
+export const M2_PRIMER_PISO = 49.90;
+export const M2_SEGUNDO_PISO = 53.87;
+
+export const PLAN_FACTS = {
+  proyecto: 'Vivienda Laurel 2020',
+  conjunto: 'Altos del Maiten Etapa 7',
+  constructora: 'MALPO',
+  regimen: 'D.F.L. N°2',
+  antejardinMin: 3.0,
+  escalaPlantas: '1:50',
+  escalaSuperficies: '1:100',
+  superficieTerrenoAprox: 121,
+};
