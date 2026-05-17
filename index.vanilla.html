@@ -1389,6 +1389,19 @@ Object.entries(toggleMap).forEach(([id, g]) => {
   });
 });
 
+document.querySelectorAll('[id^="wall-"]').forEach(control => {
+  control.addEventListener('input', () => {
+    clearGroup(groups.perimeter);
+    buildPerimeter();
+    groups.perimeter.visible = document.getElementById('t-perimeter').checked;
+  });
+  control.addEventListener('change', () => {
+    clearGroup(groups.perimeter);
+    buildPerimeter();
+    groups.perimeter.visible = document.getElementById('t-perimeter').checked;
+  });
+});
+
 // Tabs
 document.querySelectorAll('.tab').forEach(tab => {
   tab.addEventListener('click', () => {

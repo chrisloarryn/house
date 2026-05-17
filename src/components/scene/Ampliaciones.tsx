@@ -20,8 +20,10 @@ export function Ampliaciones({ scenario, palette, toggles }: { scenario: Scenari
   const colorBand = isMed ? palette.cuboBand : 0xeeeeee;
   const rearStartZ = cz + L.casa.fondo;
   const rearCenterX = cx + L.casa.ancho / 2;
-  const latLeftX = cx - (scenario.ampLatL?.ancho ?? 0);
-  const latRightX = cx + L.casa.ancho;
+  const latLeftX = cx + L.casa.ancho;
+  const latLeftWidth = L.lote.frente - latLeftX;
+  const latRightX = 0;
+  const latRightWidth = cx;
   
   return (
     <group>
@@ -59,13 +61,13 @@ export function Ampliaciones({ scenario, palette, toggles }: { scenario: Scenari
       {toggles.latL && scenario.ampLatL && (
         <group>
           <Box 
-            position={[latLeftX + scenario.ampLatL.ancho / 2, scenario.ampLatL.alto / 2, cz + scenario.ampLatL.fondo / 2]} 
-            args={[scenario.ampLatL.ancho, scenario.ampLatL.alto, scenario.ampLatL.fondo]} 
+            position={[latLeftX + latLeftWidth / 2, scenario.ampLatL.alto / 2, cz + scenario.ampLatL.fondo / 2]} 
+            args={[latLeftWidth, scenario.ampLatL.alto, scenario.ampLatL.fondo]} 
             color={colorLateral} 
           />
           <Box 
-            position={[latLeftX + scenario.ampLatL.ancho / 2, scenario.ampLatL.alto + 0.09, cz + scenario.ampLatL.fondo / 2]} 
-            args={[scenario.ampLatL.ancho, 0.18, scenario.ampLatL.fondo]} 
+            position={[latLeftX + latLeftWidth / 2, scenario.ampLatL.alto + 0.09, cz + scenario.ampLatL.fondo / 2]} 
+            args={[latLeftWidth, 0.18, scenario.ampLatL.fondo]} 
             color={colorBand} 
           />
         </group>
@@ -74,13 +76,13 @@ export function Ampliaciones({ scenario, palette, toggles }: { scenario: Scenari
       {toggles.latR && scenario.ampLatR && (
         <group>
           <Box 
-            position={[latRightX + scenario.ampLatR.ancho / 2, scenario.ampLatR.alto / 2, cz + scenario.ampLatR.fondo / 2]} 
-            args={[scenario.ampLatR.ancho, scenario.ampLatR.alto, scenario.ampLatR.fondo]} 
+            position={[latRightX + latRightWidth / 2, scenario.ampLatR.alto / 2, cz + scenario.ampLatR.fondo / 2]} 
+            args={[latRightWidth, scenario.ampLatR.alto, scenario.ampLatR.fondo]} 
             color={colorLateral} 
           />
           <Box 
-            position={[latRightX + scenario.ampLatR.ancho / 2, scenario.ampLatR.alto + 0.09, cz + scenario.ampLatR.fondo / 2]} 
-            args={[scenario.ampLatR.ancho, 0.18, scenario.ampLatR.fondo]} 
+            position={[latRightX + latRightWidth / 2, scenario.ampLatR.alto + 0.09, cz + scenario.ampLatR.fondo / 2]} 
+            args={[latRightWidth, 0.18, scenario.ampLatR.fondo]} 
             color={colorBand} 
           />
         </group>
