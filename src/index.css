@@ -563,41 +563,156 @@ button {
 }
 
 @media (max-width: 720px) {
+  body {
+    overflow: hidden;
+  }
+
   .ui-overlay {
+    display: flex;
+    flex-direction: column;
+    width: 100vw;
+    height: 100dvh;
     gap: 12px;
     padding: 10px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .ui-overlay > * {
+    flex: 0 0 auto;
+    min-width: 0;
+    max-width: 100%;
   }
 
   .project-panel,
   .decision-panel,
-  .plan-panel,
   .controls-panel {
     padding: 12px;
   }
 
+  .project-panel {
+    max-width: none;
+  }
+
+  .project-panel h1 {
+    margin: 6px 0 0;
+    font-size: 1.78rem;
+    line-height: 1;
+  }
+
+  .project-panel p {
+    display: none;
+  }
+
+  .eyebrow,
+  .panel-heading,
+  .controls-header span,
+  .price-estimator label {
+    font-size: 0.68rem;
+  }
+
+  .top-shell {
+    display: contents;
+  }
+
   .metrics-grid,
-  .toggle-grid,
+  .toggle-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .metrics-grid {
+    margin-top: 10px;
+  }
+
+  .metrics-grid div {
+    padding: 10px;
+  }
+
+  .metrics-grid span,
+  .panel-label,
+  .floor-row span,
+  .price-total span {
+    font-size: 0.66rem;
+  }
+
   .scenario-tabs {
     grid-template-columns: 1fr 1fr;
   }
 
-  .scenario-tabs .tab-btn:first-child {
-    grid-column: 1 / -1;
+  .tab-btn {
+    min-height: 40px;
+    font-size: 0.78rem;
   }
 
-  .price-estimator,
-  .plan-thumbs {
+  .dfl-card {
+    padding: 12px;
+  }
+
+  .dfl-card strong {
+    font-size: 1.52rem;
+  }
+
+  .dfl-badge {
+    padding: 5px 8px;
+    font-size: 0.72rem;
+  }
+
+  .plan-panel {
+    display: none;
+  }
+
+  .bottom-area {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: stretch;
+  }
+
+  .controls-panel {
+    width: 100%;
+  }
+
+  .controls-header {
+    margin-bottom: 8px;
+  }
+
+  .toggle-grid {
+    gap: 6px;
+  }
+
+  .toggle-row {
+    min-width: 0;
+    min-height: 34px;
+    padding: 6px 8px;
+    font-size: 0.72rem;
+    overflow-wrap: anywhere;
+  }
+
+  .price-estimator {
     grid-template-columns: 1fr;
   }
 
   .view-buttons {
+    width: 100%;
+    max-width: 100%;
     overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .view-buttons::-webkit-scrollbar {
+    display: none;
+  }
+
+  .view-btn {
+    flex: 1 0 auto;
+    min-width: 64px;
+    min-height: 36px;
+    padding: 0 10px;
   }
 
   .hint {
-    width: 100%;
-    justify-content: center;
-    white-space: normal;
-    text-align: center;
+    display: none;
   }
 }
