@@ -94,6 +94,12 @@ function getConstructionBlocks(scenarioKey: ScenarioKey, toggles: VisibilityTogg
 export function Overlay() {
   const { scenario, setScenario, view, setView, toggles, toggleVisibility, setAllToggles } = useStore();
   const [pricePerM2, setPricePerM2] = React.useState('');
+  const [projectOpen, setProjectOpen] = React.useState(() => (
+    typeof window === 'undefined' ? true : !window.matchMedia('(max-width: 720px)').matches
+  ));
+  const [scenarioOpen, setScenarioOpen] = React.useState(() => (
+    typeof window === 'undefined' ? true : !window.matchMedia('(max-width: 720px)').matches
+  ));
   const [layersOpen, setLayersOpen] = React.useState(() => (
     typeof window === 'undefined' ? true : !window.matchMedia('(max-width: 720px)').matches
   ));
@@ -129,56 +135,77 @@ export function Overlay() {
   return (
     <div className="ui-overlay">
       <header className="top-shell">
-        <section className="project-panel">
-          <div className="eyebrow">
-            <FileText size={14} aria-hidden />
-            Plano municipal · {PLAN_FACTS.escalaPlantas}
-          </div>
+        <section className={`project-panel collapsible-panel ${projectOpen ? 'open' : ''}`}>
+          <button
+            className="panel-topline collapsible-trigger"
+            type="button"
+            aria-expanded={projectOpen}
+            onClick={() => setProjectOpen((isOpen) => !isOpen)}
+          >
+            <span className="eyebrow">
+              <FileText size={14} aria-hidden />
+              Plano municipal · {PLAN_FACTS.escalaPlantas}
+            </span>
+            <ChevronDown size={16} aria-hidden className="collapse-chevron" />
+          </button>
           <h1>Casa Laurel</h1>
-          <p>
-            {PLAN_FACTS.proyecto}, {PLAN_FACTS.conjunto}. La lectura parte del plano oficial y compara la casa actual con dos ampliaciones.
-          </p>
+          <div className="collapsible-content" hidden={!projectOpen}>
+            <p>
+              {PLAN_FACTS.proyecto}, {PLAN_FACTS.conjunto}. La lectura parte del plano oficial y compara la casa actual con dos ampliaciones.
+            </p>
 
-          <div className="metrics-grid" aria-label="Metricas del plano oficial">
-            <div>
-              <span>Total actual</span>
-              <strong>{M2_ACTUAL.toFixed(2)} m²</strong>
-            </div>
-            <div>
-              <span>Primer piso</span>
-              <strong>{M2_PRIMER_PISO.toFixed(2)} m²</strong>
-            </div>
-            <div>
-              <span>Segundo piso</span>
-              <strong>{M2_SEGUNDO_PISO.toFixed(2)} m²</strong>
-            </div>
-            <div>
-              <span>Antejardín</span>
-              <strong>{PLAN_FACTS.antejardinMin.toFixed(1)} m</strong>
+            <div className="metrics-grid" aria-label="Metricas del plano oficial">
+              <div>
+                <span>Total actual</span>
+                <strong>{M2_ACTUAL.toFixed(2)} m²</strong>
+              </div>
+              <div>
+                <span>Primer piso</span>
+                <strong>{M2_PRIMER_PISO.toFixed(2)} m²</strong>
+              </div>
+              <div>
+                <span>Segundo piso</span>
+                <strong>{M2_SEGUNDO_PISO.toFixed(2)} m²</strong>
+              </div>
+              <div>
+                <span>Antejardín</span>
+                <strong>{PLAN_FACTS.antejardinMin.toFixed(1)} m</strong>
+              </div>
             </div>
           </div>
         </section>
 
-        <aside className="decision-panel" aria-label="Comparador de escenarios">
-          <div className="scenario-tabs">
-            {SCENARIO_TABS.map((key) => (
-              <button
-                key={key}
-                className={`tab-btn ${scenario === key ? 'active' : ''}`}
-                onClick={() => setScenario(key)}
-              >
-                {SCENARIOS[key].name}
-              </button>
-            ))}
-          </div>
-
-          <div className="dfl-card">
-            <div>
-              <span className="panel-label">Ampliación seleccionada</span>
-              <strong>+{additionalM2.toFixed(1)} m²</strong>
+        <aside className={`decision-panel collapsible-panel ${scenarioOpen ? 'open' : ''}`} aria-label="Comparador de escenarios">
+          <button
+            className="panel-topline collapsible-trigger"
+            type="button"
+            aria-expanded={scenarioOpen}
+            onClick={() => setScenarioOpen((isOpen) => !isOpen)}
+          >
+            <span className="panel-heading compact-heading">Escenario</span>
+            <ChevronDown size={16} aria-hidden className="collapse-chevron" />
+          </button>
+          <div className="collapsible-content" hidden={!scenarioOpen}>
+            <div className="scenario-tabs">
+              {SCENARIO_TABS.map((key) => (
+                <button
+                  key={key}
+                  className={`tab-btn ${scenario === key ? 'active' : ''}`}
+                  onClick={() => setScenario(key)}
+                >
+                  {SCENARIOS[key].name}
+                </button>
+              ))}
             </div>
-            <div className="dfl-badge ok">Total {totalM2.toFixed(1)} m²</div>
-            {inactiveM2 > 0 && <small>{inactiveM2.toFixed(1)} m² ocultos por capas apagadas.</small>}
+
+            <div className="dfl-card">
+              <div>
+                <span className="panel-label">Ampliación seleccionada</span>
+                <strong>+{additionalM2.toFixed(1)} m²</strong>
+              </div>
+              <div className="dfl-badge ok">Total {totalM2.toFixed(1)} m²</div>
+              {inactiveM2 > 0 && <small>{inactiveM2.toFixed(1)} m² ocultos por capas apagadas.</small>}
+            </div>
           </div>
         </aside>
       </header>

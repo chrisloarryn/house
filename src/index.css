@@ -302,6 +302,18 @@ button {
   margin-bottom: 12px;
 }
 
+.panel-topline {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: center;
+}
+
+.compact-heading {
+  margin-bottom: 0;
+}
+
 .plan-thumbs {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -621,12 +633,18 @@ button {
     padding: 12px;
   }
 
+  .project-panel,
+  .decision-panel {
+    display: grid;
+    gap: 10px;
+  }
+
   .project-panel {
     max-width: none;
   }
 
   .project-panel h1 {
-    margin: 6px 0 0;
+    margin: 0;
     font-size: 1.78rem;
     line-height: 1;
   }
@@ -673,6 +691,22 @@ button {
   .tab-btn {
     min-height: 40px;
     font-size: 0.78rem;
+  }
+
+  .project-panel:not(.open),
+  .decision-panel:not(.open),
+  .controls-panel:not(.open) {
+    gap: 0;
+  }
+
+  .project-panel:not(.open) h1 {
+    font-size: 1.28rem;
+  }
+
+  .project-panel:not(.open) .panel-topline,
+  .decision-panel:not(.open) .panel-topline,
+  .controls-panel:not(.open) .controls-header {
+    margin-bottom: 0;
   }
 
   .dfl-card {
