@@ -29,12 +29,12 @@ const FLOOR_PROGRAM = [
   {
     label: 'Primer piso',
     area: M2_PRIMER_PISO,
-    rooms: ['estar', 'comedor', 'cocina', 'bano visita', 'despensa', 'dormitorio 4'],
+    rooms: ['estar', 'comedor', 'cocina', 'baño visita', 'despensa', 'dormitorio 4'],
   },
   {
     label: 'Segundo piso',
     area: M2_SEGUNDO_PISO,
-    rooms: ['dormitorio 1', 'dormitorio 2', 'dormitorio 3', 'dos banos', 'escritorio estar'],
+    rooms: ['dormitorio 1', 'dormitorio 2', 'dormitorio 3', 'dos baños', 'escritorio estar'],
   },
 ];
 
@@ -61,7 +61,7 @@ function getConstructionBlocks(scenarioKey: ScenarioKey, toggles: VisibilityTogg
 
   if (activeScenario.ampLatL) {
     blocks.push({
-      label: 'Ampliacion lateral izq.',
+      label: 'Ampliación lateral izq.',
       m2: activeScenario.ampLatL.ancho * activeScenario.ampLatL.fondo,
       active: toggles.latL,
     });
@@ -69,7 +69,7 @@ function getConstructionBlocks(scenarioKey: ScenarioKey, toggles: VisibilityTogg
 
   if (activeScenario.ampLatR) {
     blocks.push({
-      label: 'Ampliacion lateral der.',
+      label: 'Ampliación lateral der.',
       m2: activeScenario.ampLatR.ancho * activeScenario.ampLatR.fondo,
       active: toggles.latR,
     });
@@ -77,7 +77,7 @@ function getConstructionBlocks(scenarioKey: ScenarioKey, toggles: VisibilityTogg
 
   if (activeScenario.ampBack) {
     blocks.push({
-      label: activeScenario.ampBack.fondo > 2 ? 'Living + logia posterior' : 'Estiron posterior DFL2',
+      label: activeScenario.ampBack.fondo > 2 ? 'Living + logia posterior' : 'Estirón posterior DFL2',
       m2: activeScenario.ampBack.ancho * activeScenario.ampBack.fondo,
       active: toggles.back,
     });
@@ -117,7 +117,7 @@ export function Overlay() {
     { key: 'latL', label: 'Lateral izq.' },
     { key: 'latR', label: 'Lateral der.' },
     { key: 'patio', label: 'Patio interior' },
-    { key: 'pergola', label: 'Pergola' },
+    { key: 'pergola', label: 'Pérgola' },
     { key: 'fence', label: 'Reja' },
   ];
 
@@ -148,7 +148,7 @@ export function Overlay() {
               <strong>{M2_SEGUNDO_PISO.toFixed(2)} m²</strong>
             </div>
             <div>
-              <span>Antejardin</span>
+              <span>Antejardín</span>
               <strong>{PLAN_FACTS.antejardinMin.toFixed(1)} m</strong>
             </div>
           </div>

@@ -40,7 +40,7 @@ export const useStore = create<AppState>((set) => ({
     existing: true,
     roof: true,
     cube1: true,
-    cube2: false,
+    cube2: true,
     back: true,
     latL: true,
     latR: true,

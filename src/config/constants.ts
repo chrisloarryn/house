@@ -24,7 +24,7 @@ export const M2_SEGUNDO_PISO = 53.87;
 
 export const PLAN_FACTS = {
   proyecto: 'Vivienda Laurel 2020',
-  conjunto: 'Altos del Maiten Etapa 7',
+  conjunto: 'Altos del Maitén Etapa 7',
   constructora: 'MALPO',
   regimen: 'D.F.L. N°2',
   antejardinMin: 3.0,
