@@ -1,5 +1,5 @@
 import React from 'react';
-import { L, cx, cz } from '../../config/constants';
+import { L, PLAN3D, cx, cz } from '../../config/constants';
 import type { Palette } from '../../config/palettes';
 
 function Box({ position, args, color }: { position: [number, number, number], args: [number, number, number], color: number }) {
@@ -11,12 +11,12 @@ function Box({ position, args, color }: { position: [number, number, number], ar
   );
 }
 
-function FrontStrip({ x, y, z, width, color = 0x5f5a4b }: { x: number; y: number; z: number; width: number; color?: number }) {
-  return <Box position={[x, y, z]} args={[width, 0.022, 0.035]} color={color} />;
+function FrontStrip({ x, y, z, width, color = 0x6d654f }: { x: number; y: number; z: number; width: number; color?: number }) {
+  return <Box position={[x, y, z]} args={[width, 0.018, 0.032]} color={color} />;
 }
 
-function SideStrip({ x, y, z, depth, color = 0x5f5a4b }: { x: number; y: number; z: number; depth: number; color?: number }) {
-  return <Box position={[x, y, z]} args={[0.035, 0.022, depth]} color={color} />;
+function SideStrip({ x, y, z, depth, color = 0x6d654f }: { x: number; y: number; z: number; depth: number; color?: number }) {
+  return <Box position={[x, y, z]} args={[0.032, 0.018, depth]} color={color} />;
 }
 
 export function ExistingHouse({
@@ -34,7 +34,6 @@ export function ExistingHouse({
   const a2 = L.casa.alto2;
   const leftW = L.casa.volIzq.ancho;
   const rightW = w - leftW;
-  const rightSetback = 0.58;
   const porchDepth = 1.28;
   const leftCenterX = cx + leftW / 2;
   const rightCenterX = cx + leftW + rightW / 2;
@@ -42,8 +41,17 @@ export function ExistingHouse({
   const leftBayRightX = cx + leftW;
   const rightBayLeftX = cx + leftW;
   const rightBayRightX = cx + w;
-  const leftFrontZ = cz - 0.07;
-  const rightFrontZ = cz + rightSetback - 0.04;
+  const upperSmallW = PLAN3D.upperFloor.leftSmall.ancho;
+  const upperSmallX0 = cx + PLAN3D.upperFloor.leftSmall.x;
+  const upperSmallCenterX = upperSmallX0 + upperSmallW / 2;
+  const upperSmallFrontZ = cz + PLAN3D.upperFloor.leftSmall.zFront;
+  const upperSmallDepth = PLAN3D.upperFloor.leftSmall.fondo;
+  const upperMainX0 = cx + PLAN3D.upperFloor.rightMain.x;
+  const upperMainX1 = upperMainX0 + PLAN3D.upperFloor.rightMain.ancho;
+  const upperMainW = upperMainX1 - upperMainX0;
+  const upperMainCenterX = upperMainX0 + upperMainW / 2;
+  const upperMainFrontZ = cz + PLAN3D.upperFloor.rightMain.zFront;
+  const upperMainDepth = PLAN3D.upperFloor.rightMain.fondo;
 
   const z = cz + f / 2;
 
@@ -61,11 +69,15 @@ export function ExistingHouse({
         color={palette.estuco1}
       />
       
-      {/* Piso 2 en dos crujías: izquierda adelantada y derecha retranqueada según planta/foto */}
-      <Box position={[leftCenterX, a1 + a2 / 2, z]} args={[leftW, a2, f]} color={palette.siding2} />
+      {/* Piso 2: frontón derecho principal, más grande, detrás del volumen izquierdo */}
       <Box
-        position={[rightCenterX, a1 + a2 / 2, cz + rightSetback + (f - rightSetback) / 2]}
-        args={[rightW, a2, f - rightSetback]}
+        position={[upperMainCenterX, a1 + a2 / 2, upperMainFrontZ + upperMainDepth / 2]}
+        args={[upperMainW, a2, upperMainDepth]}
+        color={palette.siding2}
+      />
+      <Box
+        position={[upperSmallCenterX, a1 + a2 / 2, upperSmallFrontZ + upperSmallDepth / 2]}
+        args={[upperSmallW, a2, upperSmallDepth]}
         color={palette.siding2}
       />
 
@@ -88,19 +100,19 @@ export function ExistingHouse({
       />
 
       {/* Siding horizontal visible en la fachada */}
-      {Array.from({ length: 12 }, (_, i) => a1 + 0.24 + i * 0.18).map((yLine) => (
-        <React.Fragment key={yLine}>
-          <FrontStrip x={leftCenterX} y={yLine} z={leftFrontZ} width={leftW - 0.22} />
-          <FrontStrip x={rightCenterX} y={yLine} z={rightFrontZ} width={rightW - 0.18} />
-          <SideStrip x={cx - 0.035} y={yLine} z={cz + f / 2} depth={f - 0.35} />
-          <SideStrip x={cx + w + 0.035} y={yLine} z={cz + rightSetback + (f - rightSetback) / 2} depth={f - rightSetback - 0.35} />
+      {Array.from({ length: 15 }, (_, i) => a1 + 0.20 + i * 0.145).map((yLine) => (
+          <React.Fragment key={yLine}>
+          <FrontStrip x={upperSmallCenterX} y={yLine} z={upperSmallFrontZ} width={upperSmallW - 0.22} />
+          <FrontStrip x={upperMainCenterX} y={yLine} z={upperMainFrontZ} width={upperMainW - 0.18} />
+          <SideStrip x={upperMainX0 - 0.035} y={yLine} z={upperMainFrontZ + upperMainDepth / 2} depth={upperMainDepth - 0.35} />
+          <SideStrip x={cx + w + 0.035} y={yLine} z={upperMainFrontZ + upperMainDepth / 2} depth={upperMainDepth - 0.35} />
         </React.Fragment>
       ))}
-      <Box position={[cx + leftW + 0.03, a1 + a2 / 2, cz + 0.26]} args={[0.12, a2 + 0.18, 0.12]} color={0x4b473d} />
-      <Box position={[cx + w - 0.06, a1 + a2 / 2, rightFrontZ]} args={[0.12, a2 + 0.18, 0.1]} color={0x6b6558} />
-      <Box position={[cx - 0.08, a1 + a2 / 2, cz + f / 2]} args={[0.14, a2 + 0.2, 0.1]} color={0xd7d0be} />
-      <Box position={[cx + leftW - 0.06, a1 + a2 / 2, cz + f / 2]} args={[0.12, a2 + 0.2, 0.1]} color={0xd7d0be} />
-      <Box position={[cx + w + 0.08, a1 + a2 / 2, cz + f / 2]} args={[0.14, a2 + 0.2, 0.1]} color={0xd7d0be} />
+      <Box position={[upperSmallX0 - 0.06, a1 + a2 / 2, cz + 0.26]} args={[0.12, a2 + 0.18, 0.12]} color={0x4b473d} />
+      <Box position={[cx + w - 0.06, a1 + a2 / 2, upperSmallFrontZ]} args={[0.12, a2 + 0.18, 0.1]} color={0x6b6558} />
+      <Box position={[cx + w + 0.08, a1 + a2 / 2, upperSmallFrontZ + upperSmallDepth / 2]} args={[0.14, a2 + 0.2, 0.1]} color={0xd7d0be} />
+      <Box position={[upperMainX0 - 0.08, a1 + a2 / 2, upperMainFrontZ + upperMainDepth / 2]} args={[0.14, a2 + 0.2, 0.1]} color={0xd7d0be} />
+      <Box position={[upperSmallX0 - 0.06, a1 + a2 / 2, upperMainFrontZ + upperMainDepth / 2]} args={[0.12, a2 + 0.2, 0.1]} color={0xd7d0be} />
 
       {/* Ventanas Piso 1 */}
       <Window position={[rightCenterX, 1.33, cz - 0.105]} args={[1.88, 1.42]} palette={palette} divisions={3} sill />
@@ -110,9 +122,9 @@ export function ExistingHouse({
       <SlidingDoor position={[cx + 4.04, 1.08, cz + f + 0.08]} args={[1.78, 2.11]} palette={palette} />
 
       {/* Ventanas Piso 2 */}
-      <Window position={[rightCenterX, a1 + 1.18, rightFrontZ - 0.03]} args={[1.12, 1.08]} palette={palette} divisions={2} />
+      <Window position={[upperMainX0 + upperMainW * 0.68, a1 + 1.18, upperMainFrontZ - 0.03]} args={[1.18, 1.12]} palette={palette} divisions={2} />
       <SideWindow position={[cx - 0.09, a1 + 0.95, cz + 2.2]} palette={palette} />
-      <Vent position={[rightBayRightX - 0.28, a1 + 2.1, rightFrontZ - 0.05]} />
+      <Vent position={[upperMainX0 + upperMainW * 0.15, a1 + 2.1, upperMainFrontZ - 0.05]} />
 
       {/* Cierre opcional del acceso cuando no se usa el cubo frontal */}
       {showMudroomClosure && (

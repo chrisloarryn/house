@@ -15,7 +15,7 @@ function Box({ position, args, color, opacity = 1, rotation = [0, 0, 0] }: {
   );
 }
 
-function Pickets({ x0, x1, z = 0.02, height = 1.95, spacing = 0.22 }: { x0: number; x1: number; z?: number; height?: number; spacing?: number }) {
+function Pickets({ x0, x1, z = 0.02, height = 2.18, spacing = 0.18 }: { x0: number; x1: number; z?: number; height?: number; spacing?: number }) {
   const width = Math.max(0, x1 - x0);
   const count = Math.max(1, Math.floor(width / spacing));
 
@@ -23,14 +23,14 @@ function Pickets({ x0, x1, z = 0.02, height = 1.95, spacing = 0.22 }: { x0: numb
     <group>
       {Array.from({ length: count }, (_, i) => {
         const x = x0 + ((i + 0.5) * width) / count;
-        return <Box key={`${x0}-${i}`} position={[x, height / 2 + 0.08, z]} args={[0.035, height, 0.035]} color={0x111111} />;
+        return <Box key={`${x0}-${i}`} position={[x, height / 2 + 0.08, z]} args={[0.045, height, 0.045]} color={0x0b0b0b} />;
       })}
     </group>
   );
 }
 
 function Rail({ x0, x1, y, z = 0.02 }: { x0: number; x1: number; y: number; z?: number }) {
-  return <Box position={[(x0 + x1) / 2, y, z]} args={[x1 - x0, 0.055, 0.045]} color={0x111111} />;
+  return <Box position={[(x0 + x1) / 2, y, z]} args={[x1 - x0, 0.06, 0.05]} color={0x0b0b0b} />;
 }
 
 function DiagonalRail({ y }: { y: number }) {
@@ -46,7 +46,7 @@ function DiagonalRail({ y }: { y: number }) {
   );
 }
 
-function DiagonalPickets({ height = 1.95, spacing = 0.22 }: { height?: number; spacing?: number }) {
+function DiagonalPickets({ height = 2.18, spacing = 0.18 }: { height?: number; spacing?: number }) {
   const cut = L.lote.chaflanDer;
   const len = Math.hypot(cut.frente, cut.fondo);
   const count = Math.max(1, Math.floor(len / spacing));
@@ -72,9 +72,9 @@ function SlidingCarGate({ x0, x1 }: { x0: number; x1: number }) {
     <group>
       <Rail x0={x0} x1={x1} y={0.34} z={-0.04} />
       <Rail x0={x0} x1={x1} y={1.62} z={-0.04} />
-      <Pickets x0={x0 + 0.08} x1={x1 - 0.08} z={-0.04} height={1.75} spacing={0.2} />
-      <Box position={[x0, 0.95, -0.04]} args={[0.08, 1.85, 0.06]} color={0x0b0b0b} />
-      <Box position={[x1, 0.95, -0.04]} args={[0.08, 1.85, 0.06]} color={0x0b0b0b} />
+      <Pickets x0={x0 + 0.08} x1={x1 - 0.08} z={-0.04} height={2.05} spacing={0.18} />
+      <Box position={[x0, 1.1, -0.04]} args={[0.09, 2.15, 0.07]} color={0x0b0b0b} />
+      <Box position={[x1, 1.1, -0.04]} args={[0.09, 2.15, 0.07]} color={0x0b0b0b} />
       <Box position={[(x0 + x1) / 2, 0.08, -0.08]} args={[x1 - x0 + 0.22, 0.05, 0.08]} color={0x0b0b0b} />
     </group>
   );
@@ -88,9 +88,9 @@ function PedestrianGate({ center, width }: { center: number; width: number }) {
     <group>
       <Rail x0={x0} x1={x1} y={0.34} z={-0.035} />
       <Rail x0={x0} x1={x1} y={1.58} z={-0.035} />
-      <Pickets x0={x0 + 0.08} x1={x1 - 0.08} z={-0.035} height={1.72} spacing={0.18} />
-      <Box position={[x0, 0.95, -0.035]} args={[0.07, 1.9, 0.06]} color={0x0b0b0b} />
-      <Box position={[x1, 0.95, -0.035]} args={[0.07, 1.9, 0.06]} color={0x0b0b0b} />
+      <Pickets x0={x0 + 0.08} x1={x1 - 0.08} z={-0.035} height={2.02} spacing={0.17} />
+      <Box position={[x0, 1.08, -0.035]} args={[0.08, 2.12, 0.06]} color={0x0b0b0b} />
+      <Box position={[x1, 1.08, -0.035]} args={[0.08, 2.12, 0.06]} color={0x0b0b0b} />
       <mesh position={[x1 - 0.18, 0.96, -0.09]}>
         <sphereGeometry args={[0.04, 12, 12]} />
         <meshStandardMaterial color={0x050505} roughness={0.35} metalness={0.5} />
@@ -125,8 +125,8 @@ export function Fence({ hideVisualLeftSide = false }: FenceProps) {
 
       <Rail x0={0.05} x1={carGateX0} y={0.34} />
       <Rail x0={carGateX1} x1={pedestrianX0} y={0.34} />
-      <Rail x0={0.05} x1={carGateX0} y={1.62} />
-      <Rail x0={carGateX1} x1={pedestrianX0} y={1.62} />
+      <Rail x0={0.05} x1={carGateX0} y={1.76} />
+      <Rail x0={carGateX1} x1={pedestrianX0} y={1.76} />
 
       <Pickets x0={0.05} x1={carGateX0} />
       <Pickets x0={carGateX1} x1={pedestrianX0} />
@@ -134,9 +134,9 @@ export function Fence({ hideVisualLeftSide = false }: FenceProps) {
       {!hideVisualLeftSide && (
         <>
           <Rail x0={pedestrianX1} x1={frontEndX - 0.05} y={0.34} />
-          <Rail x0={pedestrianX1} x1={frontEndX - 0.05} y={1.62} />
+          <Rail x0={pedestrianX1} x1={frontEndX - 0.05} y={1.76} />
           <DiagonalRail y={0.34} />
-          <DiagonalRail y={1.62} />
+          <DiagonalRail y={1.76} />
           <Pickets x0={pedestrianX1} x1={frontEndX - 0.05} />
           <DiagonalPickets />
         </>

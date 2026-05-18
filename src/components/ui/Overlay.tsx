@@ -22,9 +22,6 @@ import {
 import type { ScenarioKey } from '../../config/scenarios';
 import type { ViewKey, VisibilityToggles } from '../../store/useStore';
 
-const plantaP1 = new URL('../../../images/espacios/plano_secciones/01_planta_piso1.png', import.meta.url).href;
-const plantaP2 = new URL('../../../images/espacios/plano_secciones/02_planta_piso2.png', import.meta.url).href;
-
 const SCENARIO_TABS: ScenarioKey[] = ['actual', 'ampliacion'];
 
 const FLOOR_PROGRAM = [
@@ -122,7 +119,9 @@ export function Overlay() {
     { key: 'neighbors', label: 'Vecinos' },
     { key: 'existing', label: 'Casa oficial' },
     { key: 'roof', label: 'Techo dos aguas' },
-    { key: 'radierFront', label: 'Radier frontal' },
+    { key: 'radierFrontA', label: 'Radier frontal A' },
+    { key: 'radierFrontB', label: 'Radier frontal B' },
+    { key: 'radierFrontC', label: 'Radier frontal C' },
     { key: 'radierRight', label: 'Radier lateral der.' },
     { key: 'radierBack', label: 'Radier trasero' },
     { key: 'cube1', label: 'Cubo P1' },
@@ -219,17 +218,6 @@ export function Overlay() {
         <div className="panel-heading">
           <Ruler size={16} aria-hidden />
           <span>Programa del plano</span>
-        </div>
-
-        <div className="plan-thumbs">
-          <figure>
-            <img src={plantaP1} alt="Planta arquitectura primer piso" />
-            <figcaption>Piso 1</figcaption>
-          </figure>
-          <figure>
-            <img src={plantaP2} alt="Planta arquitectura segundo piso" />
-            <figcaption>Piso 2</figcaption>
-          </figure>
         </div>
 
         <div className="floor-program">

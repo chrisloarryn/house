@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import * as THREE from 'three';
-import { L, cx, cz } from '../../config/constants';
+import { L, PLAN3D, cx, cz } from '../../config/constants';
 import type { Palette } from '../../config/palettes';
 
 function Plano({ verts, color }: { verts: number[], color: number }) {
@@ -63,10 +63,13 @@ function SlopedTrim({
 
 export function Roof({ palette }: { palette: Palette; isActual: boolean }) {
   const yBase = L.casa.alto1 + L.casa.alto2;
-  const f = L.casa.fondo;
-  const leftW = L.casa.volIzq.ancho;
-  const rightW = L.casa.ancho - leftW;
-  const rightSetback = 0.58;
+  const upperSmallX0 = cx + PLAN3D.upperFloor.leftSmall.x;
+  const upperMainX0 = cx + PLAN3D.upperFloor.rightMain.x;
+  const upperMainX1 = upperMainX0 + PLAN3D.upperFloor.rightMain.ancho;
+  const upperSmallFrontZ = cz + PLAN3D.upperFloor.leftSmall.zFront;
+  const upperSmallDepth = PLAN3D.upperFloor.leftSmall.fondo;
+  const upperMainFrontZ = cz + PLAN3D.upperFloor.rightMain.zFront;
+  const upperMainDepth = PLAN3D.upperFloor.rightMain.fondo;
 
   const roofColor = palette.techo;
   const trimColor = palette.zocalo || 0xd4c8b2;
@@ -74,53 +77,53 @@ export function Roof({ palette }: { palette: Palette; isActual: boolean }) {
 
   return (
     <group>
-      {/* Techo izquierdo adelantado: domina la fachada, como en la foto */}
+      {/* Frontón izquierdo del plano: menor, adelantado y sin ventana frontal */}
       <GableFrontal 
-        x0={cx - 0.28} 
-        x1={cx + leftW + 0.32} 
-        zFace={cz - 0.28} 
-        fondo={f + 0.55} 
-        alt={L.casa.gableFrenteIzq.alt} 
+        x0={upperSmallX0 - 0.18} 
+        x1={cx + L.casa.ancho + 0.28} 
+        zFace={upperSmallFrontZ - 0.06} 
+        fondo={upperSmallDepth + 0.34} 
+        alt={PLAN3D.upperFloor.leftSmall.roofAlt} 
         yBase={yBase} 
         siding={sidingColor} 
         roof={roofColor} 
         trim={trimColor}
       />
       <EaveTrim
-        x0={cx - 0.34}
-        x1={cx + leftW + 0.38}
-        zFront={cz - 0.38}
-        zBack={cz + f + 0.32}
+        x0={upperSmallX0 - 0.24}
+        x1={cx + L.casa.ancho + 0.34}
+        zFront={upperSmallFrontZ - 0.12}
+        zBack={upperSmallFrontZ + upperSmallDepth + 0.24}
         y={yBase - 0.08}
         color={trimColor}
       />
 
-      {/* Techo derecho retranqueado: parte desde el acceso y aparece atrás */}
+      {/* Frontón derecho del plano: principal, retrasado, profundo y con ventana */}
       <GableFrontal 
-        x0={cx + leftW - 0.18} 
-        x1={cx + leftW + rightW + 0.28} 
-        zFace={cz + rightSetback - 0.24} 
-        fondo={f - rightSetback + 0.5} 
-        alt={L.casa.gableFrenteIzq.alt * 0.92} 
+        x0={upperMainX0 - 0.42} 
+        x1={upperMainX1 + 0.45} 
+        zFace={upperMainFrontZ - 0.62} 
+        fondo={upperMainDepth + 0.74} 
+        alt={PLAN3D.upperFloor.rightMain.roofAlt} 
         yBase={yBase} 
         siding={sidingColor} 
         roof={roofColor} 
         trim={trimColor}
       />
       <EaveTrim
-        x0={cx + leftW - 0.25}
-        x1={cx + L.casa.ancho + 0.34}
-        zFront={cz + rightSetback - 0.34}
-        zBack={cz + f + 0.32}
+        x0={upperMainX0 - 0.48}
+        x1={upperMainX1 + 0.52}
+        zFront={upperMainFrontZ - 0.72}
+        zBack={upperMainFrontZ + upperMainDepth + 0.34}
         y={yBase - 0.08}
         color={trimColor}
       />
 
       {/* Canaletas/bajadas negras visibles en la unión de los dos frontones */}
-      <Box position={[cx + leftW + 0.08, yBase - 0.16, cz - 0.08]} args={[0.12, 0.12, 0.55]} color={0x1d1d1d} />
-      <Box position={[cx + leftW + 0.08, yBase / 2 + 0.28, cz + 0.12]} args={[0.07, yBase - 0.55, 0.07]} color={0x1d1d1d} />
+      <Box position={[upperSmallX0 - 0.08, yBase - 0.16, upperMainFrontZ - 0.14]} args={[0.12, 0.12, 0.55]} color={0x1d1d1d} />
+      <Box position={[upperSmallX0 - 0.08, yBase / 2 + 0.28, upperMainFrontZ + 0.06]} args={[0.07, yBase - 0.55, 0.07]} color={0x1d1d1d} />
       <Box position={[cx - 0.18, yBase / 2 + 0.2, cz + 0.08]} args={[0.055, yBase - 0.65, 0.055]} color={0x1d1d1d} />
-      <Box position={[cx + L.casa.ancho + 0.18, yBase / 2 + 0.2, cz + rightSetback + 0.08]} args={[0.055, yBase - 0.65, 0.055]} color={0x1d1d1d} />
+      <Box position={[cx + L.casa.ancho + 0.18, yBase / 2 + 0.2, upperMainFrontZ + 0.08]} args={[0.055, yBase - 0.65, 0.055]} color={0x1d1d1d} />
     </group>
   );
 }

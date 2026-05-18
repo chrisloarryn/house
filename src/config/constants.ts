@@ -22,6 +22,27 @@ export const M2_ACTUAL = 103.77;
 export const M2_PRIMER_PISO = 49.90;
 export const M2_SEGUNDO_PISO = 53.87;
 
+export const PLAN3D = {
+  upperFloor: {
+    // Lectura desde elevacion principal del PDF: izquierda visual = techo menor y adelantado.
+    leftSmall: {
+      x: 0,
+      ancho: 3.45,
+      zFront: -0.12,
+      fondo: L.casa.fondo - 1.35,
+      roofAlt: L.casa.gableFrenteIzq.alt * 0.76,
+    },
+    // Derecha visual = volumen principal con ventana, mas retrasado y mas profundo.
+    rightMain: {
+      x: 2.35,
+      ancho: L.casa.ancho - 2.35,
+      zFront: 0.44,
+      fondo: L.casa.fondo - 0.08,
+      roofAlt: L.casa.gableFrenteIzq.alt * 1.12,
+    },
+  },
+};
+
 export const PLAN_FACTS = {
   proyecto: 'Vivienda Laurel 2020',
   conjunto: 'Altos del Maitén Etapa 7',

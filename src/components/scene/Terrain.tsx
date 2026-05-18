@@ -38,10 +38,10 @@ export function Terrain() {
           <meshStandardMaterial color={scenario === 'actual' ? 0x9b9b9b : 0x7a8a52} roughness={1} />
         </mesh>
 
-      {/* Tierra antejardin */}
+      {/* Base blanca antejardin cuando no hay radier */}
       <mesh position={[L.lote.frente / 2, 0.012, cz / 2 + 0.1]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
         <planeGeometry args={[L.lote.frente - 0.3, cz - 0.25]} />
-        <meshStandardMaterial color={0x6c5134} roughness={1} />
+        <meshStandardMaterial color={0xf1f1ea} roughness={1} />
       </mesh>
 
       {/* Linea edificación */}

@@ -14,13 +14,14 @@ export interface Palette {
 
 export const PAL: Record<PaletteKey, Palette> = {
   actual: {
-    estuco1: 0xe7e1d4,  // estuco crema claro
-    siding2: 0xb2a78d,  // siding beige/taupe real
-    marco: 0x343434,    // marcos y reja oscuros
-    techo: 0x202124,    // cubierta asfáltica grafito
+    estuco1: 0xf0eee5,  // estuco claro como fachada real
+    siding2: 0xb8ad91,  // siding beige/taupe real
+    marco: 0x2c2c2c,    // marcos y reja oscuros
+    techo: 0x111315,    // cubierta asfáltica negra
     cubo: 0xffffff,
     cuboBand: 0xeeeeee,
-    zocalo: 0xd4c8b2
+    zocalo: 0xd9d2c2,
+    vidrio: 0x8fa3aa
   },
   idea: {
     estuco1: 0xcccccc,  // gris claro

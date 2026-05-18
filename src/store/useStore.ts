@@ -7,7 +7,9 @@ export interface VisibilityToggles {
   neighbors: boolean;
   existing: boolean;
   roof: boolean;
-  radierFront: boolean;
+  radierFrontA: boolean;
+  radierFrontB: boolean;
+  radierFrontC: boolean;
   radierRight: boolean;
   radierBack: boolean;
   cube1: boolean;
@@ -44,7 +46,9 @@ export const useStore = create<AppState>((set) => ({
     neighbors: true,
     existing: true,
     roof: true,
-    radierFront: true,
+    radierFrontA: true,
+    radierFrontB: true,
+    radierFrontC: false,
     radierRight: false,
     radierBack: false,
     cube1: false,
