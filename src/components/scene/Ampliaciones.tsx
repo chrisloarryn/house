@@ -13,11 +13,30 @@ function Box({ position, args, color }: { position: [number, number, number], ar
   );
 }
 
+function StuccoGrain({ x, zStart, depth, height }: { x: number, zStart: number, depth: number, height: number }) {
+  return (
+    <group>
+      {Array.from({ length: 22 }, (_, i) => {
+        const z = zStart + 0.22 + ((i * 0.43) % Math.max(0.5, depth - 0.44));
+        const y = 0.35 + ((i * 0.31) % Math.max(0.5, height - 0.7));
+        const shade = i % 3 === 0 ? 0xf4ead5 : i % 3 === 1 ? 0xcab789 : 0xb49c6f;
+        return (
+          <mesh key={i} position={[x, y, z]} rotation={[0, Math.PI / 2, 0]}>
+            <circleGeometry args={[0.018 + (i % 4) * 0.004, 8]} />
+            <meshStandardMaterial color={shade} roughness={1} />
+          </mesh>
+        );
+      })}
+    </group>
+  );
+}
+
 export function Ampliaciones({ scenario, palette, toggles }: { scenario: Scenario, palette: Palette, toggles: VisibilityToggles }) {
   const isMed = scenario.paleta === 'med';
   const colorBase = isMed ? palette.estuco1 : palette.cubo;
-  const colorLateral = isMed ? 0xd8c190 : 0xc8b898;
+  const colorLateral = 0xe6d4b0;
   const colorBand = isMed ? palette.cuboBand : 0xeeeeee;
+  const techoMedColor = palette.teja || 0xb55a30;
   const rearStartZ = cz + L.casa.fondo;
   const rearCenterX = cx + L.casa.ancho / 2;
   const latLeftX = cx + L.casa.ancho;
@@ -70,6 +89,60 @@ export function Ampliaciones({ scenario, palette, toggles }: { scenario: Scenari
             args={[latLeftWidth, 0.18, scenario.ampLatL.fondo]} 
             color={colorBand} 
           />
+          <mesh position={[latLeftX + latLeftWidth / 2, scenario.ampLatL.alto + 0.38, cz + scenario.ampLatL.fondo / 2]} rotation={[0, 0, -0.12]}>
+            <boxGeometry args={[latLeftWidth + 0.42, 0.12, scenario.ampLatL.fondo + 0.42]} />
+            <meshStandardMaterial color={techoMedColor} roughness={0.86} />
+          </mesh>
+          <Box
+            position={[L.lote.frente - 0.08, scenario.ampLatL.alto + 0.22, cz + scenario.ampLatL.fondo / 2]}
+            args={[0.12, 0.12, scenario.ampLatL.fondo + 0.34]}
+            color={0x25221f}
+          />
+          <Box
+            position={[L.lote.frente - 0.08, scenario.ampLatL.alto - 0.72, cz + scenario.ampLatL.fondo - 0.24]}
+            args={[0.09, 1.72, 0.09]}
+            color={0x25221f}
+          />
+          {Array.from({ length: 9 }, (_, i) => {
+            const amp = scenario.ampLatL!;
+            return (
+              <mesh
+                key={i}
+                position={[latLeftX + latLeftWidth / 2, amp.alto + 0.46, cz + 0.45 + i * ((amp.fondo - 0.9) / 8)]}
+                rotation={[0, 0, -0.12]}
+              >
+                <boxGeometry args={[latLeftWidth + 0.5, 0.026, 0.05]} />
+                <meshStandardMaterial color={0x8f3f27} roughness={0.9} />
+              </mesh>
+            );
+          })}
+          <StuccoGrain
+            x={L.lote.frente + 0.004}
+            zStart={cz}
+            depth={scenario.ampLatL.fondo}
+            height={scenario.ampLatL.alto}
+          />
+          {toggles.latLDoor && (
+            <>
+              <Box
+                position={[latLeftX + latLeftWidth / 2, 1.05, cz - 0.025]}
+                args={[0.86, 2.1, 0.05]}
+                color={0x4b3b2a}
+              />
+              <Box
+                position={[latLeftX + latLeftWidth / 2, 1.05, cz + scenario.ampLatL.fondo + 0.025]}
+                args={[0.86, 2.1, 0.05]}
+                color={0x4b3b2a}
+              />
+            </>
+          )}
+          {toggles.latLWindow && (
+            <Box
+              position={[L.lote.frente + 0.025, 1.48, cz + scenario.ampLatL.fondo * 0.55]}
+              args={[0.05, 1.05, 1.18]}
+              color={palette.vidrio || 0x6f858f}
+            />
+          )}
         </group>
       )}
 

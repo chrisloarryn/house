@@ -15,6 +15,7 @@ import { Roof } from './Roof';
 import { Cubo } from './Cubo';
 import { Ampliaciones } from './Ampliaciones';
 import { Fence } from './Fence';
+import { Radier } from './Radier';
 
 export function Scene() {
   const { scenario, toggles, view } = useStore();
@@ -86,6 +87,7 @@ export function Scene() {
 
       <group position={[0, 0, 0]}>
         {toggles.terrain && <Terrain />}
+        <Radier toggles={toggles} />
         {toggles.perimeter && <Perimeter />}
         {toggles.neighbors && <Neighbors palette={palette} />}
         
@@ -111,7 +113,9 @@ export function Scene() {
           toggles={toggles} 
         />
         
-        {toggles.fence && activeScenario.fence && <Fence />}
+        {toggles.fence && activeScenario.fence && (
+          <Fence hideVisualLeftSide={toggles.perimeter} />
+        )}
       </group>
     </>
   );

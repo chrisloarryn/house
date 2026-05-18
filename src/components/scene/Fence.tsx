@@ -99,7 +99,11 @@ function PedestrianGate({ center, width }: { center: number; width: number }) {
   );
 }
 
-export function Fence() {
+type FenceProps = {
+  hideVisualLeftSide?: boolean;
+};
+
+export function Fence({ hideVisualLeftSide = false }: FenceProps) {
   const carGateX0 = 0.18;
   const carGateX1 = Math.max(carGateX0 + 2.35, cx - 0.12);
   const pedestrianWidth = 0.95;
@@ -121,17 +125,22 @@ export function Fence() {
 
       <Rail x0={0.05} x1={carGateX0} y={0.34} />
       <Rail x0={carGateX1} x1={pedestrianX0} y={0.34} />
-      <Rail x0={pedestrianX1} x1={frontEndX - 0.05} y={0.34} />
       <Rail x0={0.05} x1={carGateX0} y={1.62} />
       <Rail x0={carGateX1} x1={pedestrianX0} y={1.62} />
-      <Rail x0={pedestrianX1} x1={frontEndX - 0.05} y={1.62} />
-      <DiagonalRail y={0.34} />
-      <DiagonalRail y={1.62} />
 
       <Pickets x0={0.05} x1={carGateX0} />
       <Pickets x0={carGateX1} x1={pedestrianX0} />
-      <Pickets x0={pedestrianX1} x1={frontEndX - 0.05} />
-      <DiagonalPickets />
+
+      {!hideVisualLeftSide && (
+        <>
+          <Rail x0={pedestrianX1} x1={frontEndX - 0.05} y={0.34} />
+          <Rail x0={pedestrianX1} x1={frontEndX - 0.05} y={1.62} />
+          <DiagonalRail y={0.34} />
+          <DiagonalRail y={1.62} />
+          <Pickets x0={pedestrianX1} x1={frontEndX - 0.05} />
+          <DiagonalPickets />
+        </>
+      )}
 
       <SlidingCarGate x0={carGateX0} x1={carGateX1} />
       <PedestrianGate center={pedestrianCenter} width={pedestrianWidth} />

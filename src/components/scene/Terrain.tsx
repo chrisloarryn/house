@@ -44,12 +44,6 @@ export function Terrain() {
         <meshStandardMaterial color={0x6c5134} roughness={1} />
       </mesh>
 
-      {/* Huella estacionamiento */}
-      <mesh position={[L.lote.frente / 2, 0.015, cz / 2 + 0.1]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
-        <planeGeometry args={[L.lote.frente - 0.3, cz - 0.25]} />
-        <meshStandardMaterial color={0xa0a0a0} roughness={0.8} />
-      </mesh>
-
       {/* Linea edificación */}
       <line>
         <bufferGeometry>

@@ -7,11 +7,16 @@ export interface VisibilityToggles {
   neighbors: boolean;
   existing: boolean;
   roof: boolean;
+  radierFront: boolean;
+  radierRight: boolean;
+  radierBack: boolean;
   cube1: boolean;
   cube2: boolean;
   back: boolean;
   latL: boolean;
   latR: boolean;
+  latLDoor: boolean;
+  latLWindow: boolean;
   patio: boolean;
   pergola: boolean;
   fence: boolean;
@@ -39,11 +44,16 @@ export const useStore = create<AppState>((set) => ({
     neighbors: true,
     existing: true,
     roof: true,
+    radierFront: true,
+    radierRight: false,
+    radierBack: false,
     cube1: false,
     cube2: false,
     back: true,
     latL: true,
     latR: false,
+    latLDoor: true,
+    latLWindow: true,
     patio: true,
     pergola: true,
     fence: true,
